@@ -22,5 +22,9 @@ class Pool extends Model
     {
         return $this->hasMany(PoolSchedule::class,'pool_id');
     }
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class,"pool_id");
+    }
 }
 

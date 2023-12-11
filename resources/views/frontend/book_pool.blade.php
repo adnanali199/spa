@@ -227,7 +227,7 @@ $(document).ready(function(){
         var booking_date= $(this).val();
         if(booking_date)
         {
-            $("#submit_btn").removeAttr("disabled");
+         
         }
     });
     var available_formatted_dates_list = <?php echo json_encode($dates); ?>;
@@ -260,17 +260,28 @@ $(".datepicker1").change(function(){
                 date:$(this).val()
             },
             success:function(result){
+            $("#submit_btn").attr("disabled",true);  
               $(".slots").empty();
+              var disable = false;
                for(r in result)
                {
-               if(result[r].slot_id==1)
+             
+               if(result[r].slot_id==2)
                {
-               $(".slots").append('<div class="col-md-6"><label> Day <input type="radio" name="slot_id" class="" value="1"></label></div>');
+                disable=true;
+                var append = '<div class="col-md-6"><label> Night <input type="hidden" name="schedule_id" value="'+result[r].schedule_id+'"><input type="radio" name="slot_id"   class="" value="2"></label></div>';
+               $(".slots").append(append);
                }
-               else  if(result[r].slot_id==2)
+              else if(result[r].slot_id==1)
                {
-               $(".slots").append('<div class="col-md-6"><label> Night <input type="radio" name="slot_id" class="" value="2"></label></div>');
+                disable=true;
+                var append = '<div class="col-md-6"><label> Day <input type="hidden" name="schedule_id" value="'+result[r].schedule_id+'"><input type="radio" name="slot_id"   class="" value="1"></label></div>';
+               $(".slots").append(append);
                }
+            }
+            if(disable)
+            {
+                $("#submit_btn").removeAttr("disabled");
             }
             }
         });

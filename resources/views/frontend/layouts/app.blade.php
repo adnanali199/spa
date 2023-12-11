@@ -127,8 +127,26 @@
         <nav id="primary-menu" class="not-dark " >
         <ul class="one-page-menu" data-easing="easeInOutExpo" data-speed="1250" data-offset="0">
         <li class="current"><a href="{{route('/')}}" ><div>Home</div></a></li>
-        <li><a href="#" data-href="#section-about"><div>About</div></a></li>
-        <li><a href="#pools" data-href="#pools"><div>Pools</div></a></li>
+        <li><a href="{{route('/')}}#pools" data-href="{{route('/')}}"><div>Pools</div></a></li>
+        <li><a href="{{route('bookings')}}" ><div>{{ __('MY Bookings') }}</div></a></li>
+        <li class=" dropdown">  
+            <!-- Right navbar links -->
+        
+         
+              <a class="" data-toggle="dropdown" href="#" aria-expanded="false">
+                  {{ __('Language') }}
+              </a>
+              <div class="dropdown-menu " style="left: inherit; right: 0px;">
+                
+                    <a href="{{ route('locale', ['locale' => 'en']) }}"  class="dropdown-item btn btn-primary {{ Session::get('locale') == 'en' ? 'active' : ''}}">{{ __("English")}}</a>
+                    <a href="{{ route('locale', ['locale' => 'fr']) }}"  class="dropdown-item btn btn-primary {{ Session::get('locale') == 'fr' ? 'active' : ''}}">{{ __("Arabic")}}</a>
+                <div class="dropdown-divider"></div>
+                 
+
+              </div>
+         
+      
+            </li>
         @if (Route::has('login'))
         
             @auth

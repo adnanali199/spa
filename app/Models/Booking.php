@@ -12,4 +12,8 @@ class Booking extends Model
     {
         
     }
+    public function pool()
+    {
+        return $this->belongsTo(Pool::class,'pool_id');
+    }
 }

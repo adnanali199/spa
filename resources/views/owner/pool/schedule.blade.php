@@ -135,7 +135,7 @@ function loadCalendar(event) {
                  {       
                 
                 var index = selected_data.indexOf(data_obj); 
-                const newArr = arr.filter(object => {
+                const newArr = available_date.filter(object => {
                                 return object.id !== 3;
                                 });           
                         if (index > -1) {
@@ -168,22 +168,13 @@ function loadCalendar(event) {
          $("#available_date").val(selected);
          return false;
   },
-  selectable: false,
+
   events:event,
-  validRange: function (nowDate) {
-  return {
-    start: nowDate
-  };
-},
-  select:function(info){
-    const date1 = new Date(info.startStr);
-    const date2 = new Date(info.endStr);
-    let allDates = getDatesBetween(date1, date2);
-    $("#available_date").val(selected);
-  },
+ 
+
   eventDidMount: function(info) {
-  //  $(info.el).parent().parent().parent().css('background',"#20c997");
-   console.log(info);
+   //$(info.el).parent().parent().parent().css('background',"#20c997");
+   //console.log(info);
    var id = info.event.extendedProps.date_available; 
    var append = '<div class="selected" >';
         if(info.event.extendedProps.slot_id==1){
@@ -197,7 +188,11 @@ function loadCalendar(event) {
       $(info.el).append(append);    
     
 },
- 
+/*validRange: function (nowDate) {
+  return {
+    start: nowDate
+  };
+},*/
     });
     calendar.render()
   }

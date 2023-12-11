@@ -215,7 +215,7 @@ class PoolController extends Controller
         if(($available_date[0])==""){
             $available_date=array_unique (array_merge ($days, $nights));
         }
-       // dd(($available_date));
+      // dd(($available_date));
         $data = array();
         $i=0;
         foreach($available_date as $ad)
@@ -224,7 +224,7 @@ class PoolController extends Controller
             $item = PoolSchedule::firstOrNew($data);
           //  dd($item->id);
             $item->save();
-            echo $item->id;
+            
             if($item->id)
             {
                 PoolScheduleSlots::where("schedule_id",$item->id)->delete();

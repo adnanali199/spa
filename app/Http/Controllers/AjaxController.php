@@ -187,7 +187,7 @@ class AjaxController extends Controller
         $pool_id =$request->pool_id;
         $date = $request->date;
         $events=PoolSchedule::join('pool_schedule_slots','pool_schedules.id','=','pool_schedule_slots.schedule_id')
-        ->select("slot_id")->where('pool_id',$pool_id)->where('date_available',$date)->get();
+        ->where('pool_id',$pool_id)->where('date_available',$date)->where('pool_schedule_slots.status','available')->get();
         return response()->json($events);
 
     }

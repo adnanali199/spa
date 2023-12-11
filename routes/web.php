@@ -8,7 +8,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\AjaxController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
-
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +26,7 @@ Route::get('/home', [FrontendController::class, 'index'])->name('home');
 Route::get('/pool/{id?}', [\App\Http\Controllers\FrontendController::class, 'pool'])->name('pool.details');
 Route::get('/book/pool/{id?}', [\App\Http\Controllers\FrontendController::class, 'bookPool'])->name('pool.book')->middleware('auth');
 Route::post('/book/final', [\App\Http\Controllers\FrontendController::class, 'bookPoolAction'])->name('pool.bookaction')->middleware('auth');
+Route::get('/bookings', [\App\Http\Controllers\FrontendController::class, 'myBookings'])->name('bookings')->middleware('auth');
 Route::post('/search', [\App\Http\Controllers\FrontendController::class, 'search'])->name('pool.search');
 Route::post('/save_token', [\App\Http\Controllers\FrontendController::class, 'saveToken'])->name('save_token');
 Route::get('/send_notification', [\App\Http\Controllers\FrontendController::class, 'sendNotification'])->name('send_notification');
@@ -96,5 +97,12 @@ Route::post('/change_user_status',[AjaxController::class,'changeUserStatus'])->n
 
     Route::get('/get_iban',[AjaxController::class,'getOwnerIBAN'])->name('getOwnerIBAN');
     Route::post('/get_schedule',[AjaxController::class,'getSlots'])->name('get_schedule');
+
+   
+
+Route::get('/locale/{locale}', function (Request $request, $locale) {
+    Session::put('locale', $locale);
+    return redirect()->back();
+})->name('locale');
 
 Auth::routes();

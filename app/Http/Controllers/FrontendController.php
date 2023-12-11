@@ -8,6 +8,7 @@ use App\Models\PoolSchedule;
 use App\Models\BookingPayment;
 use App\Models\User;
 use App\Models\Settings;
+use App\Models\PoolScheduleSlots;
 class FrontendController extends Controller
 {
     public function __construct()
@@ -31,7 +32,7 @@ class FrontendController extends Controller
     public function bookPool($id=false)
     {
      $pool = Pool::find($id);
-     $date_available =PoolSchedule::where('pool_id',$id)->get();
+     $date_available =PoolSchedule::join("pool_schedule_slots","pool_schedules.id",'=','pool_schedule_slots.schedule_id')->where('pool_id',$id)->where('pool_schedule_slots.status','available')->where('date_available','>=',date('Y-m-d'))->get();
      //echo "<pre>";print_r($date_available);die();
      $dates=array();
      $i=0;
@@ -71,7 +72,8 @@ class FrontendController extends Controller
          $booking_payment->name_on_card=$request->name_on_card?$request->name_on_card:NULL;
          $booking_payment->save();
          
-         return redirect(route('/'))->with('success',"Your booking request is sent successfully.");
+         $pool_schedule_slot = PoolScheduleSlots::where('schedule_id',$request->schedule_id)->where('slot_id',$request->slot_id)->update(['status'=>'booked']);
+         return redirect(route('bookings'))->with('success',"Your booking request is sent successfully.");
      }
      public function search(Request $request)
      {
@@ -103,5 +105,18 @@ class FrontendController extends Controller
         $user->save();
         return response()->json(['token saved successfully.']);
     }
-   
+    public function myBookings(Request $request)
+    {
+       
+        $bookings = Booking::join('users','bookings.customer_id','=','users.id')
+        
+        ->join('pool_slots','pool_slots.id','=','bookings.slot_id')
+        ->where('bookings.customer_id',"=",\Auth::user()->id)
+        ->orderBy('bookings.id','desc')
+        ->get(['bookings.*', 'pool_slots.slot']);
+        
+       
+     
+        return view('frontend.bookings',compact('bookings'));
+    }
     }
