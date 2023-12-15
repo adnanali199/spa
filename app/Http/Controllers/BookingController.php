@@ -13,7 +13,8 @@ class BookingController extends Controller
     //
     public function index()
     {
-        return view('owner.booking.list');
+        $pools = Pool::all();
+        return view('owner.booking.list',compact('pools'));
     }
     public function list(Request $request)
     {
@@ -29,12 +30,14 @@ class BookingController extends Controller
             return DataTables::of($data)
                     ->addIndexColumn()
                     ->addColumn('action', function($row){
-                        if($row->status==2){    
-                        $btn = '<a href="javascript:void(0)" onClick="approve(this)"  data-mode="approve"  data-id="'.$row->id.'" class="edit btn btn-success btn-sm">Approve</a>
-                                <a href="javascript:void(0)" onClick="approve(this)"  data-mode="reject"   data-id="'.$row->id.'" class="edit btn btn-danger btn-sm">Reject</a>';
+                        $btn ='<a href="javascript:void(0)" onClick="edit(this)"  data-mode="edit"   data-id="'.$row->id.'" class="mt-1 edit btn btn-info btn-sm">Edit</a>';  
+
+                        if($row->status==2){  
+                                                       $btn .='<a href="javascript:void(0)" onClick="approve(this)"  data-mode="approve"  data-id="'.$row->id.'" class="mt-1 ml-1 edit btn btn-success btn-sm">Approve</a>
+                                <a href="javascript:void(0)" onClick="approve(this)"  data-mode="reject"   data-id="'.$row->id.'" class="mt-1 edit btn btn-danger btn-sm">Reject</a>';
                         }
                         else{
-                            $btn='';
+                            $btn .='';
                         }
                                 return $btn;
                     })

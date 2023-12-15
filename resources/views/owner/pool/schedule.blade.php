@@ -26,7 +26,7 @@
 @section('content')
 <!-- Content Header (Page header) -->
 <div class="content-header">
-    <div class="container">
+    <div class="">
         <div class="row mb-2">
             <div class="col-sm-6 col-md-12">
                 <h4 class="m-0"><i class="fa fa-plus"></i>
@@ -39,7 +39,7 @@
 
 <!-- Main content -->
 <div class="content">
-    <div class="container">
+    <div class="">
         <div class="row">
           
             <div class="col-lg-12">

@@ -1513,12 +1513,8 @@ span.flatpickr-weekday {
 }
 
 .s002 {
-  min-height: 100vh;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-      justify-content: center;
-  -ms-flex-align: center;
+overflow: hidden;
+  margin:0px auto;
       align-items: center;
   font-family: 'Poppins', sans-serif;
   background: url("../images/bg.jpg");
@@ -1530,6 +1526,7 @@ span.flatpickr-weekday {
 .s002 form {
   width: 100%;
   max-width: 1190px;
+  margin:0px auto;
 }
 
 .s002 form legend {
@@ -1720,9 +1717,9 @@ span.flatpickr-weekday {
 }
 
 .s002 form .inner-form .input-field.fifth-wrap .btn-search {
-  height: 70px;
+  height: 40px;
   width: 100%;
-  background: #b78a62;
+  background: #242a23;
   white-space: nowrap;
   border-radius: .5px;
   font-size: 20px;
@@ -1735,10 +1732,11 @@ span.flatpickr-weekday {
 }
 
 .s002 form .inner-form .input-field.fifth-wrap .btn-search:hover {
-  background: #af7d51;
+  background: #242a23;
 }
 
 @media screen and (max-width: 992px) {
+
   .s002 form legend {
     font-size: 50px;
     text-align: center;
@@ -1749,9 +1747,16 @@ span.flatpickr-weekday {
         flex-wrap: wrap;
     -ms-flex-pack: justify;
         justify-content: space-between;
+        padding:8px;
   }
   .s002 form .inner-form .input-field {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
+  }
+  .s002 form .inner-form .input-field input{
+    height:40px;
+  }
+  .s002 form legend{
+    margin-bottom:5px;
   }
   .s002 form .inner-form .input-field.first-wrap {
     width: 100%;
@@ -1780,11 +1785,11 @@ span.flatpickr-weekday {
 @media screen and (max-width: 767px) {
   .s002 form legend {
     font-size: 40px;
-    margin-bottom: 40px;
+    margin-bottom: 5px;
   }
   .s002 form .inner-form .input-field.second-wrap, .s002 form .inner-form .input-field.third-wrap, .s002 form .inner-form .input-field.fouth-wrap, .s002 form .inner-form .input-field.fifth-wrap {
     width: 100%;
-    margin-bottom: 15px;
+    
   }
   .s002 form .inner-form .input-field.fifth-wrap {
     margin-bottom: 0;

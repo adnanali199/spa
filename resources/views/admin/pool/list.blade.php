@@ -74,3 +74,10 @@
     <!-- /.content -->
 
 @endsection
+@section('scripts')
+<script>
+    $(document).ready(function(){
+        alert();
+    });
+</script>
+@endsection

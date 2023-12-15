@@ -70,9 +70,8 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [ 'unique:users'],
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'cpr' => ['required', 'string', 'max:255', 'unique:users'],
         ]);
     }
 
@@ -86,18 +85,17 @@ class RegisterController extends Controller
     {
         $user =  User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            
             'phone' => $data['phone'],
-            'address'=> $data['address'],
-            'cpr'=> $data['cpr'],
-            'password' => Hash::make($data['password']),
+            
+            'cpr'   => $data['cpr'],
+            'password' => Hash::make($data['cpr']),
         ]);
-        $user_id = $user->id;
-        $contact_no = $data['an_other'];
+        $user_id = \DB::getPdo()->lastInsertId();
+      
         Customer::create(
             [
             "user_id"=>$user_id,
-            "contact_no"=>$contact_no,
             "cpr"=>$data['cpr']
             ]
         );

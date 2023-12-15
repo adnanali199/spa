@@ -3,7 +3,7 @@ import jQuery from 'jquery';
 import axios from 'axios';
 import 'bootstrap';
 import slick from 'slick-carousel';
-
+import Swal from 'sweetalert2';
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
  * for JavaScript based Bootstrap features such as modals and tabs. This
@@ -20,7 +20,7 @@ window.$ = window.jQuery = jQuery;
  */
 
 window.axios = axios;
-
+window.Swal = Swal
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.slick=slick;
 /**

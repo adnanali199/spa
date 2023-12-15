@@ -32,7 +32,7 @@ class AjaxController extends Controller
     public function getUserDetail(Request $request)
     {
         $user_id =$request->user_id;
-        $users = User::where('users.id',$user_id)->join('customers','users.id','=','customers.user_id')->select('users.id','users.name','users.phone','users.email','customers.cpr','customers.contact_no')->get();
+        $users = User::where('users.id',$user_id)->join('customers','users.id','=','customers.user_id')->select('users.id','users.name','users.phone','customers.cpr','customers.contact_no')->get();
        
         $response=array();
         foreach($users as $user)
@@ -85,6 +85,36 @@ class AjaxController extends Controller
         
         return response()->json($formattedEvents);
     }
+
+    // get booking details
+
+    public function getBookingDetail(Request $request)
+    {
+        $booking_id =$request->booking_id;
+        $bookings = Booking::where('bookings.id',$booking_id)
+                ->join('users','users.id','=','bookings.customer_id')
+                ->join('pool_slots','bookings.slot_id','=','pool_slots.id')
+                ->join('booking_payment','bookings.id','=','booking_payment.booking_id')
+                ->where('bookings.id',$booking_id)
+                ->get(['bookings.*','users.name','users.id as customer_id','pool_slots.slot','booking_payment.payment_mode','booking_payment.card_type','booking_payment.name_on_card','booking_payment.status']);
+       
+        $response=array();
+        foreach($bookings as $booking)
+        {
+            $response['id']=$booking->id;
+            $response['pool_id']=$booking->pool_id;
+            $response['customer_id']=$booking->customer_id;
+            $response['customer_name']=$booking->name;
+            $response['booking_date']=$booking->booking_date;
+            $response['slot_id']=$booking->slot_id;
+            $response['payment_mode']=$booking->payment_mode;
+            $response['card_type']=$booking->card_type;
+            $response['name_on_card']=$booking->name_on_card;
+            
+        }
+        return response()->json($response);
+    }
+
     public function getOwnerIBAN(Request $request)
     {
         $owner_id = $request->owner_id;

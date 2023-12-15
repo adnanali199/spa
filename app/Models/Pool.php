@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PoolImages;
+use App\Models\PoolFeatures;
 use App\Models\PoolSchedule;
 class Pool extends Model
 {
@@ -17,6 +18,10 @@ class Pool extends Model
     public function images()
     {
         return $this->hasMany(PoolImages::class,'pool_id');
+    }
+    public function features()
+    {
+        return $this->hasMany(PoolFeatures::class);
     }
     public function schedules()
     {

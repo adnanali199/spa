@@ -9,6 +9,7 @@ use App\Models\BookingPayment;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\PoolScheduleSlots;
+use App\Models\PoolFeatures;
 class FrontendController extends Controller
 {
     public function __construct()
@@ -27,7 +28,8 @@ class FrontendController extends Controller
 
         $pool = Pool::find($id);
         $settings = Settings::find(1);
-        return view('frontend.pool',compact('pool','settings'));
+        $features = PoolFeatures::where('pool_id',$id)->get();
+        return view('frontend.pool',compact('pool','settings','features'));
     }
     public function bookPool($id=false)
     {
@@ -42,8 +44,9 @@ class FrontendController extends Controller
         $i++;
      }
      $settings = Settings::find(1);
+     $features = PoolFeatures::where('pool_id',$id)->get();
     // echo "<pre>";print_r(json_encode($dates));die();
-     return view('frontend.book_pool',compact('pool','dates','settings'));
+     return view('frontend.book_pool',compact('pool','dates','settings','features'));
     }
      public function bookPoolAction(Request $request)
      {

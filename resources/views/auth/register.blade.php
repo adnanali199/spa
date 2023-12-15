@@ -67,7 +67,7 @@
                 </span>
                 @enderror
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-3 d-none">
                 <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                        placeholder="{{ __('Email') }}"  autocomplete="email" value="{{ old('email') }}">
                 <div class="input-group-append">
@@ -81,20 +81,8 @@
                 </span>
                 @enderror
             </div>
-            <div class=" mb-3">
-                <label>{{__('Address')}}</label>
-                <textarea rows="4" cols="20" name="address" class="form-control @error('address') is-invalid @enderror"
-                       placeholder="{{ __('Address') }}" required autocomplete="address" autofocus>
-                       {{    old('address') }}
-                    </textarea>
-              
-                @error('address')
-                <span class="error invalid-feedback">
-                    {{ $message }}
-                </span>
-                @enderror
-            </div>
-            <div class="input-group mb-3">
+            
+            <div class="input-group mb-3 d-none">
                 <input type="phone" name="an_other" class="form-control @error('an_other') is-invalid @enderror"
                        placeholder="{{ __('An Other Contact') }}" value="{{ old('an_other') }}" autocomplete="an_other" autofocus>
                 <div class="input-group-append">
@@ -108,9 +96,9 @@
                 </span>
                 @enderror
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-3 d-none">
                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
-                       placeholder="{{ __('Password') }}" required autocomplete="new-password">
+                       placeholder="{{ __('Password') }}"  autocomplete="new-password">
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-lock"></span>
@@ -123,10 +111,10 @@
                 @enderror
             </div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-3 d-none">
                 <input type="password" name="password_confirmation"
                        class="form-control @error('password_confirmation') is-invalid @enderror"
-                       placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
+                       placeholder="{{ __('Confirm Password') }}"  autocomplete="new-password">
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-lock"></span>

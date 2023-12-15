@@ -16,12 +16,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" integrity="sha512-yHknP1/AwR+yx26cB1y0cjvQUMvEa2PFzt1c9LlS4pRQ5NOTZFWbhBig+X9G9eYW/8m0/4OXNx8pxJ6z57x0dw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
+        body,.content,.content-wrapper
+        {
+            box-sizing: border-box;
+            overflow: hidden;
+        }
         .select2-container .select2-selection--single{
             height:40px!important;
         }
         .dataTables_filter{
             float: right;
         }
+        .fc .fc-button{
+            padding:3px 5px;
+            margin-top:3px;
+            
+        }
+       
     </style>
 
     @yield('styles')
@@ -117,8 +128,8 @@
 
 <!-- REQUIRED SCRIPTS -->
 
-<link rel="modulepreload" href="{{ asset('build/assets/app-81c4945e.js') }}" />
-<script type="module" src="{{ asset('build/assets/app-81c4945e.js') }}"></script><!-- AdminLTE App -->
+<link rel="modulepreload" href="{{ asset('build/assets/app-83c4400f.js') }}" />
+<script type="module" src="{{ asset('build/assets/app-83c4400f.js') }}"></script><!-- AdminLTE App -->
 
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte.min.js') }}" defer></script>

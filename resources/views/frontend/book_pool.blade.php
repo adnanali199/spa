@@ -35,54 +35,12 @@
                     
                     
                     </div>
+                    @foreach($features as $feature)
                     <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/anteroom.svg') }}">
-                    <h6 class="text-info mt-1"> {{$pool->anteroom??0}} * Anteroom </h6>
+                    <img class="img img-responsive icon1" width="" src="{{ asset('icons/'.$feature->feature_icon) }}">
+                    <h6 class="text-info mt-1"> {{$feature->feature_title??0}} * {{$feature->feature_value}} </h6>
                     </div>
-    
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1 img-circle img-thumbnail" width="" src="{{ asset('images/icons/bathroom.svg') }}">
-                        <h6 class="text-info mt-1"> {{$pool->bathroom??0}} * Bathroom </h6>
-                    </div>
-    
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/shower.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->shower??0}} * Shower </h6>
-                    </div>
-    
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/bbq.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->bbq??0}} * BBQ </h6>
-                    </div>
-    
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/bedroom.svg') }}">
-                        <h6 class="text-info mt-1"> {{$pool->bedroom??0}} * Bedrooms </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/guests.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->guests_allowed??0}} * Guests Allowed </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kids_games.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->kids_games??0}} * Kids Games </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kids_pools.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->kids_pools??0}} * Kids Pools </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kitchen.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->kitchen??0}} * Kitchen </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/stereo.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->stereo??0}} * Stereo </h6>
-                    </div>
-                    <div class="col-3 col-xs-3 text-center">
-                        <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/tv.svg') }}">
-                        <h6 class="text-info mt-4"> {{$pool->tv??0}} * TV </h6>
-                    </div>
+                    @endforeach
                     
                 </div>
                 <div class="row px-3">
@@ -172,7 +130,7 @@
                 <div class="col-12">
                     <div class="form__div">
                         <input type="text" readonly name="iban" id="iban_field" class="form-control" placeholder="IBAN ">
-                        <label for="" class="form__label">IBAN <span class="text-right"> <span id="copy_iban" class="mt-2 btn btn-sm btn-success">Copy IBAN</span></span></label>
+                        <label for="" class="form__label">IBAN <span class="text-right"> <span id="copy_iban" class="mt-2 btn btn-sm btn-success d-none">Copy IBAN</span></span></label>
                     </div>
                    
                 </div>
@@ -223,6 +181,19 @@
 <script>
 $(document).ready(function(){
 
+    owner_id = $("#owner_id").val();
+        $.ajax( {
+            url: "{{route('getOwnerIBAN')}}",
+            data:  {
+                owner_id:owner_id
+            },
+            success:function(result){
+              
+               $("#iban_field").val(result.iban);
+
+            }
+        });
+    
     $("#booking_date").change(function(){
         var booking_date= $(this).val();
         if(booking_date)

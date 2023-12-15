@@ -25,8 +25,8 @@ h6{
 <div class="row ">
     
   
-    
- <div class="col-sm-12">
+    <div class="col-sm-3"></div>
+ <div class="col-sm-6">
   
     <div class="card">
         <div class="card-body p-0">
@@ -52,54 +52,13 @@ h6{
                 
                 
                 </div>
+                @foreach($features as $feature)
                 <div class="col-3 col-xs-3 text-center">
-                <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/anteroom.svg') }}">
-                <h6 class="text-info mt-1"> {{$pool->anteroom??0}} * Anteroom </h6>
+                <img class="img img-responsive icon1" width="" src="{{ asset('icons/'.$feature->feature_icon) }}">
+                <h6 class="text-info mt-1"> {{$feature->feature_title??0}} * {{$feature->feature_value}} </h6>
                 </div>
-
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1 img-circle img-thumbnail" width="" src="{{ asset('images/icons/bathroom.svg') }}">
-                    <h6 class="text-info mt-1"> {{$pool->bathroom??0}} * Bathroom </h6>
-                </div>
-
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/shower.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->shower??0}} * Shower </h6>
-                </div>
-
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/bbq.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->bbq??0}} * BBQ </h6>
-                </div>
-
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/bedroom.svg') }}">
-                    <h6 class="text-info mt-1"> {{$pool->bedroom??0}} * Bedrooms </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/guests.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->guests_allowed??0}} * Guests Allowed </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kids_games.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->kids_games??0}} * Kids Games </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kids_pools.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->kids_pools??0}} * Kids Pools </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/kitchen.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->kitchen??0}} * Kitchen </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/stereo.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->stereo??0}} * Stereo </h6>
-                </div>
-                <div class="col-3 col-xs-3 text-center">
-                    <img class="img img-responsive icon1" width="" src="{{ asset('images/icons/tv.svg') }}">
-                    <h6 class="text-info mt-4"> {{$pool->tv??0}} * TV </h6>
-                </div>
+                @endforeach
+                
                 
             </div>
             <div class="row px-3">

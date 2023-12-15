@@ -51,6 +51,7 @@ Route::middleware(['owner'])->name('owner.')->prefix('owner')->group(function(){
    // Route::get('/getIBAN/{id?}',[PoolController::class,'newPool'])->name('add-pool');
     Route::post('/add_pool/{id?}',[PoolController::class,'poolaction'])->name('poolaction');
     Route::get('/pool/delete/{id}',[PoolController::class,'delete'])->name('pools.delete');
+    Route::get('/pool/deleteimg/{id}',[PoolController::class,'deleteimg'])->name('pools.deleteimg');
     Route::get("/bookings",[BookingController::class,'index'])->name('booking.index');
     Route::get("/bookings/list",[BookingController::class,'list'])->name('booking.list');
     Route::get('/booking/{id?}',[BookingController::class,'newBooking'])->name('add-booking');
@@ -83,6 +84,7 @@ Route::post('/login',[CustomerController::class,'loginAction'])->name('clogin');
 Route::middleware(['owner'])->name('ajax.')->prefix('ajax')->group(function(){
     Route::get('/getUsers',[AjaxController::class,'getUsers'])->name('getUsers');
     Route::get('/getUserDetail',[AjaxController::class,'getUserDetail'])->name('getUserDetail');
+    Route::get('/getBookingDetail',[AjaxController::class,'getBookingDetail'])->name('getBookingDetail');
     Route::get('/pool_bookings',[AjaxController::class,'getPoolBookings'])->name('getPoolBookings');
     Route::get('/get_iban',[AjaxController::class,'getOwnerIBAN'])->name('getIBAN');
     Route::post('/change_booking_status',[AjaxController::class,'changeBookingStatus'])->name('changeBookingStatus');

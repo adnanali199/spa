@@ -17,7 +17,7 @@
         <fieldset>
             <legend>SEARCH Pool</legend>
           </fieldset>
-      <div class="inner-form">
+      <div class="inner-form mt-3">
         <div class="input-field first-wrap">
           <div class="icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -57,30 +57,29 @@
   <div class="container" id="pools">
 <h2 class="my-3 mt-5 mx-auto text-center" >Pools List</h2>
 <hr>
-<div class="row py-5">
+<div class="row py-2">
     @if($pools)
     @foreach($pools as $pool)
     
  <div class="col-sm-3">
     <a href="{{route('pool.details',$pool->id)}}">
-    <div class="card">
+    <div class="card mt-1">
         <div class="card-body p-0">
         <div style="" class="slider">
             @foreach($pool->images as $image)
             <img src=" {{ asset('uploads/'.$image->pool_image) }} " width="100%" class="img img-responsive" height="175px">
             @endforeach       
         </div>
-        <div class="px-2 py-3 ">
-        <h4 class="text-center" style="color:#00c1cf;margin-bottom:0px">{{ $pool->pool_name }}</h4>
-       
-        <div class="text-center" style="color:black">
-          <div class="list border2">Rooms: {{  $pool->no_of_rooms }}</div>
-          <div class="list ">Normal Price: <strong class="text-danger"> ${{ $pool->price }}</strong></div>
-          <div class="list border2">Pool Size : {{$pool->length}} by {{$pool->width}} </div>
-          <div class="list ">Land Size : {{$pool->land_length}} by {{$pool->land_width}} </div>
-          <hr>
-      </div>
+        <div class="px-2 py-1 ">
+          <div class="px-3">
+        
+            <div class="row">
+            <div class="col-12 col-xs-12 col-md-12 text-center"><h4>{{ $pool->short_name }}</h4></div>
+            <div class="col-12 col-xs-!2 col-md-12   text-danger">STARTING FROM: $ {{ number_format($pool->price,2) }}</div>
+            <div class="col-md-12"><i class="fa fa-map-marker text-primary" aria-hidden="true"></i>  {{ $pool->city }}</div>
+            </div>
         </div>
+      </div>
     </div>
         <!-- /.card-body -->
 

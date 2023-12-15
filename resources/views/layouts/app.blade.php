@@ -13,7 +13,13 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
-
+    <style>
+         .fc .fc-button{
+            padding:3px 5px;
+            margin-top:3px;
+            
+        }
+        </style>
     @yield('styles')
 </head>
 <body class="hold-transition sidebar-mini">

@@ -28,14 +28,14 @@
                 <div class="row">
              
                 
-             <div class="col-md-12">
+             <div class="">
                 <div class="card">
-                    <div class="card-body p-5">
+                    <div class="card-body ">
                         <form method="POST" action="{{ route('owner.poolaction',$pool->id??0) }}" enctype="multipart/form-data">
                             @csrf
                 
                             <div class="mb-3">
-                                <label>Pool Name</label>
+                                <label>{{__("Pool Name") }}</label>
                                 <input type="text" name="pool_name" class="form-control @error('pool_name') is-invalid @enderror"
                                        placeholder="{{ __('Pool Name') }}" required autocomplete="pool_name"
                                        value=" {{    !empty($pool)?$pool->pool_name:old('pool_name') }}" autofocus>
@@ -47,9 +47,9 @@
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label>Short Name</label>
+                                <label>{{__("Short Name") }}</label>
                                 <input type="text" name="short_name" class="form-control @error('short_name') is-invalid @enderror"
-                                       placeholder="{{ __('short_name') }}"
+                                       placeholder="{{ __('Short Name') }}"
                                        value=" {{    ($pool)?$pool->short_name:old('short_name') }}" 
                                        required autocomplete="short_name" autofocus>
                                
@@ -62,7 +62,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label>Header Images</label>
+                                    <label>{{__('Header Images')}}</label>
                                     <div class="input-group">
                                 <input type="file" name="images[]" multiple class="form-control @error('images') is-invalid @enderror">
                                 <div class="input-group-append">
@@ -76,10 +76,19 @@
                                     {{ $message }}
                                 </span>
                                 @enderror
+                                @if($pool && $pool->images)
+                                <div class="mt-2">
+                                @foreach($pool->images as $image)
+                        
+                                <img  src=" {{ asset('uploads/'.$image->pool_image) }} " width="150px" class="img img-responsive img-thumbnail">
+                                <a style="position: absolute;left:5px;bottom:0px" href="#" data-href="{{ route('owner.pools.deleteimg',$image->id)}}" class="btn btn-sm delete" title="{{ __('delete') }}"><i class="text-danger fa fa-trash fa-2x"></i></a>
+                                @endforeach 
+                                </div>
+                                @endif
                             </div>
                            
                                 <div class="col-md-6">
-                                    <label>Logo</label>
+                                    <label>{{ __("Logo") }}</label>
                                     <div class="input-group">
                                       
                                     <input type="file" name="logo" multiple class="form-control @error('logo') is-invalid @enderror">
@@ -94,6 +103,12 @@
                                         {{ $message }}
                                     </span>
                                     @enderror
+                                    @if($pool && $pool->logo)
+                                <div class="mt-2">
+                                <img src=" {{ asset('uploads/'.$pool->logo) }} " width="100px" class="img img-responsive img-thumbnail">
+                              
+                                </div>
+                                @endif
                             </div>
                             </div>
                             <div class="row mb-3">
@@ -141,8 +156,55 @@
 
                             </div>
 
+                            <div class="feature mb-2">
+                               
+                                @if($pool && $features)
+                                <?php $i=0;  ?>
+                                @foreach($features as $feature)
+                                <div class="row">    
+                                    <div class="col-md-4 mt-1">
+                                        <input type="text" name="feature_title[]" value="{{$feature->feature_title}}" placeholder="{{__('Title')}}" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 mt-1">
+                                        <input type="number" min=0 name="feature_value[]" value="{{$feature->feature_value}}" placeholder="{{__('Value')}}"  class="form-control">
+                                        </div>
+                                        <div class="col-md-3 mt-1">
+                                            <input type="file" name="feature_icon[]" class="form-control">
+                                            <img src="{{ asset('icons/'.$feature->feature_icon) }} "  class="mt-2 img img-responsive img-thumbnail" width="50px" >
+                                        </div>
+                                        <div class="col-md-2 mt-1 text-center">
+                                            @if($i==0)
+                                            <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
+                                            @endif
+                                            <span class="btn btn-sm btn-danger remove_feature"><i class="fa fa-trash"> </i></span>
+                                        </div>
+                                    </div>
+                                    @php 
+                                    $i++;
+                                    @endphp
+                                @endforeach
+                                @else
+                                <div class="row">    
+                                <div class="col-md-4 mt-1">
+                                    <input type="text" name="feature_title[]" class="form-control">
+                                    </div>
+                                    <div class="col-md-3 mt-1">
+                                    <input type="number" min=0 name="feature_value[]" class="form-control">
+                                    </div>
+                                    <div class="col-md-3 mt-1">
+                                        <input type="file" name="feature_icon[]" class="form-control">
+                                    </div>
+                                    <div class="col-md-2 mt-1 text-center">
+                                        <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                            <!--
                             <div class="row mb-3">
                                 
+                                    
+
                                 <div class="col-md-4">
                                     <label>Anteroom</label>
                                 <input type="number" min=0 step=1 name="anteroom" class="form-control @error('anteroom') is-invalid @enderror"
@@ -287,7 +349,7 @@
                                     @enderror
                                     </div>
 
-                            </div>
+                            </div>-->
 
                             <div class="row mb-3">
                                 <label class="col-md-12 py-2 border-bottom bg-info">Land Size</label>
@@ -357,7 +419,7 @@
                                     <input type="number" min=0 step=0.1 name="holiday_price" class="form-control @error('holiday_price') is-invalid @enderror"
                                            placeholder="{{ __('Holiday Price(BHD)') }}"
                                            value={{    ($pool)?$pool->holiday_price:old('holiday_price') }} 
-                                           required autocomplete="holiday_price" autofocus>
+                                            autocomplete="holiday_price" autofocus>
                                    
                                     @error('holiday_price')
                                     <span class="error invalid-feedback">
@@ -374,7 +436,7 @@
                                 <input type="text" name="city" class="form-control @error('city') is-invalid @enderror"
                                        placeholder="{{ __('City') }}"
                                        value='{{    ($pool)?$pool->city:old('city') }}'
-                                       required autocomplete="city" autofocus>
+                                        autocomplete="city" autofocus>
                                
                                 @error('city')
                                 <span class="error invalid-feedback">
@@ -387,7 +449,7 @@
                                     <input type="text"  name="state" class="form-control @error('state') is-invalid @enderror"
                                            placeholder="{{ __('State') }}"
                                            value='{{    ($pool)?$pool->state:old('state') }}'
-                                           required autocomplete="state" autofocus>
+                                            autocomplete="state" autofocus>
                                    
                                     @error('state')
                                     <span class="error invalid-feedback">
@@ -425,7 +487,7 @@
                                         <input type="text" name="street" class="form-control @error('street') is-invalid @enderror"
                                                placeholder="{{ __('Street') }}"
                                                value='{{    ($pool)?$pool->state:old('street') }}'
-                                               required autocomplete="street" autofocus>
+                                                autocomplete="street" autofocus>
                                        
                                         @error('street')
                                         <span class="error invalid-feedback">
@@ -436,10 +498,10 @@
 
                             </div>
                             <hr>
-                            <div class=" mb-3">
+                            <div class=" mb-3 d-none">
                                 <label class="form-label">{{ __('Description') }}</label>
                                 <textarea rows="4" cols="20" name="features" class="form-control @error('features') is-invalid @enderror"
-                                       placeholder="{{ __('features') }}" required autocomplete="features" autofocus>
+                                       placeholder="{{ __('features') }}"  autocomplete="features" autofocus>
                                        {{    ($pool)?$pool->features:old('features') }}
                                     </textarea>
                               
@@ -449,10 +511,10 @@
                                 </span>
                                 @enderror
                             </div>
-                            <div class=" mb-3">
+                            <div class=" mb-3 d-none">
                                 <label class="form-label">{{ __('Rules') }}</label>
                                 <textarea rows="4" cols="20" name="rules" class="form-control @error('rules') is-invalid @enderror"
-                                       placeholder="{{ __('rules') }}" required autocomplete="rules" autofocus>
+                                       placeholder="{{ __('rules') }}"  autocomplete="rules" autofocus>
                                        {{    ($pool)?$pool->rules:old('rules') }}
                                     </textarea>
                               
@@ -490,10 +552,14 @@
 </div>
 @endsection
 @section('scripts')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/jquery.tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-    $('textarea').tinymce({ height: 400,
+     $(document).ready(function(){
+            $(".remove_feature").click(function(){
+                alert();
+                    $(this).parent().remove();
+            });
+        });
+    /*$('textarea').tinymce({ height: 400,
         
         plugins: [
           'advlist autolink lists link image',
@@ -503,5 +569,49 @@
             "heading| bold italic | bullist numlist",
             "code"
             ],  });
+     */       
+            $(".add_feature").click(function(){
+                var append = '<div class="row mt-1">'+   
+                             '<div class="col-md-4 mt-1">'+
+                                    '<input type="text" name="feature_title[]" class="form-control">'+
+                                    '</div>'+
+                                    '<div class="col-md-3 mt-1">'+
+                                    '<input type="number" min=0 name="feature_value[]" class="form-control">'+
+                                    '</div>'+
+                                    '<div class="col-md-3 mt-1">'+
+                                    '<input type="file" name="feature_icon[]" class="form-control">'+
+                                    '</div>'+
+                                    '<div class="col-md-2 mt-1 text-center">'+
+                                    '<span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span>'+
+                                    '</div>'+
+                                '</div>';
+                $(".feature").append(append);
+            });
+           function remove(ele)
+           {
+            $(ele).parent().parent().remove();
+           }
+            $(".delete").click(function(){
+            var href = $(this).data('href');
+        Swal.fire({
+  title: "Are you sure?",
+  text: "You won't be able to revert this!",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes, delete it!"
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Your file has been deleted.",
+      icon: "success"
+    });
+    window.location.href=href;
+  }
+});
+        });
+       
   </script>
 @endsection

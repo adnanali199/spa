@@ -15,6 +15,15 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
+         .fc .fc-button{
+            padding:3px 5px;
+            margin-top:3px;
+            
+        }
+        .content-wrapper
+        {
+            padding:15px;
+        }
         .select2-container .select2-selection--single{
             height:40px!important;
         }

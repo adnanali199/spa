@@ -95,6 +95,10 @@
   margin-left: 0;
   margin-right: 0;
 }
+#calendar{
+   
+}
+
 </style>
 @endsection
 @section('content')
@@ -116,34 +120,34 @@
         
           <!--Owner Pools list -->
          
-          <div class="row">
+          <div class="slider">
             @foreach($pools as $pool)
             
-         <div class="col-sm-3">
+         <div class="col-md-3">
             <div class="card">
                 <div class="card-body p-0">
-                    <div style="" class="slider">
-                        @foreach($pool->images as $image)
-                
-                        <img src=" {{ asset('uploads/'.$image->pool_image) }} " width="100%" class="img img-responsive" height="175px">
+                    <div style="slider" >
                         
-                        @endforeach       
+                
+                        <img src=" {{ asset('uploads/'.$pool->images[0]->pool_image) }} " width="100%" class="img img-responsive" height="175px">
+                        
+                             
                     </div>
                     <div class="px-3 py-3 ">
-                    <h4 class="text-center">{{ $pool->pool_name }}</h4>
-                    <small>{{ $pool->short_name }}</small>
-                    <p class="text-right">{{ $pool->price }}</p>
+                    <h4 class="text-center">
+                       <label> {{ $pool->pool_name }}
+                        <input type="radio" name="pool_id" data-owner_id="{{ $pool->owner_id }}" value="{{ $pool->id }}" class="pool_id" class="form-control"> 
+                       </label>
+                        <input type="hidden" id="owner_id" value="{{ $pool->owner_id }}">  
+                    </h4>
+                   
+                   
 
 
             
                     </div>
                 </div>
                 <!-- /.card-body -->
-
-                <div class="card-footer clearfix">
-                        <input type="radio" name="pool_id" data-owner_id="{{ $pool->owner_id }}" value="{{ $pool->id }}" class="pool_id" class="form-control"> 
-                        <input type="hidden" id="owner_id" value="{{ $pool->owner_id }}">    
-                </div>
             </div>
         </div>
             @endforeach
@@ -216,7 +220,7 @@
           </div>
           
           <div class="mb-3 row">
-              <div class="col-md-6">
+              <div class="col-md-12">
               <label>Phone Number</label>
               <input type="number" min=0 step=0.1 name="phone" id="phone" class="form-control @error('phone') is-invalid @enderror"
                      placeholder="{{ __('phone') }}"
@@ -229,19 +233,7 @@
               </span>
               @enderror
           </div>
-          <div class="col-md-6">
-              <label>E-mail</label>
-              <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror"
-                     placeholder="{{ __('email') }}"
-                     value="{{    old('email') }} "
-                      autocomplete="email" autofocus>
-             
-              @error('email')
-              <span class="error invalid-feedback">
-                  {{ $message }}
-              </span>
-              @enderror
-          </div>
+ 
           </div>
           
           <h3>Booking info</h3>
@@ -306,7 +298,7 @@
                           <div class="col-12">
                               <div class="form__div">
                                   <input type="text" name="iban" id="iban_field" readonly class="form-control" placeholder="IBAN ">
-                                  <label for="" class="form__label">IBAN <span id="copy_iban" class="mt-2 btn btn-sm btn-success">Copy IBAN</span></span></label>
+                                  <label for="" class="form__label">IBAN <span id="copy_iban" class="mt-2 btn btn-sm btn-success d-none">Copy IBAN</span></span></label>
                               </div>
                           </div>
                       </div>
@@ -367,7 +359,18 @@
 <script>
   $(document).ready(function(){
     $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+    owner_id = $("#owner_id").val();
+        $.ajax( {
+            url: "{{route('getOwnerIBAN')}}",
+            data:  {
+                owner_id:owner_id
+            },
+            success:function(result){
+              
+               $("#iban_field").val(result.iban);
 
+            }
+        });
     //copy iban
     $("#copy_iban").click(function(){
         owner_id = $("#owner_id").val();

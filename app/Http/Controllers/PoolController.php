@@ -7,6 +7,7 @@ use App\Models\PoolImages;
 use Illuminate\Http\Request;
 use App\Models\PoolSchedule;
 use App\Models\PoolScheduleSlots;
+use App\Models\PoolFeatures;
 use Illuminate\Support\Facades\Auth;
 
 class PoolController extends Controller
@@ -27,44 +28,41 @@ class PoolController extends Controller
     {
         if($id)
         {
-            $pool=Pool::where('id',$id)->first();
+            $pool=Pool::find($id);
+            $pool_features = PoolFeatures::where('pool_id',$id)->get();
+           // echo "<pre>";print_r($pool);die();
             $data['pool']=$pool;
         }
         else{
             $data['pool']=array();
+            $pool_features=array();
         }
+        $data['features']=$pool_features;
         return view('owner.pool.create',$data);
     }
     // deal with add pool/ edit pool ---------------------
     public function poolaction(Request $request,$id=false)
     {
         //validate
-        $validate=$request->validate([
-            "pool_name"=>"required|min:5",
-            "short_name"=>"required",
-            "features"=>"required",
-            "rules"=>"required",
-            "images.*"=>"mimes:png,jpg,jpeg|required"
-        ]);
+        
+        if(!$id)
+        {
+            $validate=$request->validate([
+                "pool_name"=>"required|min:5|unique:pools",
+                "short_name"=>"required|unique:pools",
+                "images.*"=>"mimes:png,jpg,jpeg|required"
+            ]);
+        }
+        else{
+            $validate=$request->validate([
+                "pool_name"=>"required|min:5",
+                "short_name"=>"required",
+                "images.*"=>"mimes:png,jpg,jpeg|required"
+            ]);
+        }
         $pool = new Pool();
 
-        $data=[
-            "pool_name"        =>  $request->pool_name,
-            "short_name"       =>  $request->short_name,
-            "features"         =>  $request->features,
-            "rules"            =>  $request->rules,
-            "owner_id"         =>  Auth::user()->id,
-            "status"           =>  1,
-            "price"            =>   $request->price,
-            "holiday_price"     => $request->holiday_price,
-            "length"            => $request->length,
-            "width"             => $request->width,
-            "depth"             => $request->depth,
-            "anteroom"=>$request->anteroom,
-            "land_length"       => $request->land_length,
-            "land_width"        => $request->land_width,
-            "no_of_rooms"       => $request->no_of_rooms
-        ];
+      
         
         //save pool data in the table
         if(!$id){
@@ -79,25 +77,13 @@ class PoolController extends Controller
             $pool->length            = $request->length;
             $pool->width             = $request->width;
             $pool->depth             = $request->depth;
-            $pool->anteroom          = $request->anteroom;
-            $pool->bedroom           = $request->bedrooms;
-            $pool->shower            = $request->shower;
-            $pool->bathroom          = $request->bathroom;
-            $pool->bbq               = $request->bbq;
-            $pool->guests_allowed    = $request->guests_allowed;
-            $pool->kids_games        = $request->kids_games;
-            $pool->kids_pools         = $request->kids_pools;
-            $pool->kitchen           = $request->kitchen;
-            $pool->stereo            = $request->stereo;
-            $pool->tv                = $request->tv;
-            $pool->land_length       = $request->land_length;
-            $pool->land_width        = $request->land_width;
-            $pool->no_of_rooms       = $request->no_of_rooms;
+        
             $pool->save();
         $id=$pool->id;
         }
         else{
             $pool = Pool::find($id);
+           
             $pool->pool_name=  $request->pool_name;
             $pool->short_name=  $request->short_name;
             $pool->features=  $request->features;
@@ -108,20 +94,6 @@ class PoolController extends Controller
             $pool->length            = $request->length;
             $pool->width             = $request->width;
             $pool->depth             = $request->depth;
-            $pool->anteroom          = $request->anteroom;
-            $pool->bedroom           = $request->bedrooms;
-            $pool->shower            = $request->shower;
-            $pool->bathroom          = $request->bathroom;
-            $pool->bbq               = $request->bbq;
-            $pool->guests_allowed    = $request->guests_allowed;
-            $pool->kids_games        = $request->kids_games;
-            $pool->kids_pools        = $request->kids_pools;
-            $pool->kitchen           = $request->kitchen;
-            $pool->stereo            = $request->stereo;
-            $pool->tv                = $request->tv;
-            $pool->land_length       = $request->land_length;
-            $pool->land_width        = $request->land_width;
-            $pool->no_of_rooms       = $request->no_of_rooms;
             $pool->city = $request->city;
             $pool->state = $request->state;
             $pool->address = $request->street;
@@ -129,6 +101,9 @@ class PoolController extends Controller
             $pool->longitude = $request->longitude;
             $pool->save();
         }
+        
+
+
         //upload logo
           //upload files
           if($request->hasFile('logo'))
@@ -141,13 +116,14 @@ class PoolController extends Controller
               $pool->logo = $filename;
               $pool->save();
           }
+
         //upload header images files
         if($request->hasFile('images'))
         {
             if($id){
-             PoolImages::where("pool_id",$id)->delete();
+           //  PoolImages::where("pool_id",$id)->delete();
             }
-        $files = $request->file('images');
+           $files = $request->file('images');
             foreach($files as $file){
             $filename = time().'_'.$file->getClientOriginalName();
             $filePath = $file->storeAs('uploads', $filename, 'public');
@@ -159,6 +135,34 @@ class PoolController extends Controller
 
             }
         }
+
+        //Pool features 
+        if(count($request->feature_title)>0)
+          {
+            $feature_title = $request->feature_title;
+            $feature_value = $request->feature_value;
+            if($id)
+            {
+                PoolFeatures::where("pool_id",$id)->delete();
+            }
+               $files = $request->file('feature_icon');
+               for($i=0;$i<count($feature_title);$i++){
+                $filename="";
+               if($files && $files[$i])
+               {
+                $filename = time().'_'.$files[$i]->getClientOriginalName();
+                $filePath = $files[$i]->storeAs('icons', $filename, 'public');
+                $files[$i]->move("icons",$filePath);
+               }
+               PoolFeatures::create([
+               'pool_id'        =>$id,
+               'feature_title'  => $feature_title[$i],
+               'feature_value'  => $feature_value[$i],
+               'feature_icon'   => $filename
+               ]);
+   
+               }
+          }
         return redirect(route('owner.pools.list'))->with('success', 'Pool Created Successfully!');
     }
     public function delete($id=false)
@@ -257,5 +261,17 @@ class PoolController extends Controller
         }
     }
         return redirect(route('owner.pools.schedule',$request->pool_id))->with('success',"Schedule is saved successfully.");
+    }
+    public function deleteimg($id="")
+    {
+        if($id){
+            PoolImages::where("id",$id)->delete();
+           }
+           
+        else{
+            return redirect()->back()->with('error', 'Pool id is missing!');
+
+        }
+        return redirect()->back()->with('success', 'Image delete Successfully!');
     }
 }
