@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\PoolSchedule;
 use App\Models\PoolScheduleSlots;
 use App\Models\PoolFeatures;
+use App\Models\Features;
 use Illuminate\Support\Facades\Auth;
 
 class PoolController extends Controller
@@ -37,7 +38,8 @@ class PoolController extends Controller
             $data['pool']=array();
             $pool_features=array();
         }
-        $data['features']=$pool_features;
+        $data['features']=Features::all();
+        $data['features1']=$pool_features;
         return view('owner.pool.create',$data);
     }
     // deal with add pool/ edit pool ---------------------
@@ -73,11 +75,16 @@ class PoolController extends Controller
             $pool->rules=  $request->rules;
             $pool->owner_id=  Auth::user()->id;
             $pool->price = $request->price;
+            $pool->advance_price = $request->advance_price;
             $pool->holiday_price = $request->holiday_price;
             $pool->length            = $request->length;
             $pool->width             = $request->width;
             $pool->depth             = $request->depth;
-        
+            $pool->city = $request->city;
+            $pool->state = $request->state;
+            $pool->address = $request->street;
+            $pool->latitude = $request->latitude;
+            $pool->longitude = $request->longitude;
             $pool->save();
         $id=$pool->id;
         }
@@ -90,6 +97,7 @@ class PoolController extends Controller
             $pool->rules=  $request->rules;
             $pool->owner_id=  Auth::user()->id;
             $pool->price = $request->price;
+            $pool->advance_price = $request->advance_price;
             $pool->holiday_price = $request->holiday_price;
             $pool->length            = $request->length;
             $pool->width             = $request->width;
@@ -137,28 +145,22 @@ class PoolController extends Controller
         }
 
         //Pool features 
-        if(count($request->feature_title)>0)
+        if(count($request->feature_id)>0)
           {
-            $feature_title = $request->feature_title;
-            $feature_value = $request->feature_value;
+            $feature_id = $request->feature_id;
+            $feature_value=$request->feature_value;
+            
             if($id)
             {
                 PoolFeatures::where("pool_id",$id)->delete();
             }
-               $files = $request->file('feature_icon');
-               for($i=0;$i<count($feature_title);$i++){
-                $filename="";
-               if($files && $files[$i])
-               {
-                $filename = time().'_'.$files[$i]->getClientOriginalName();
-                $filePath = $files[$i]->storeAs('icons', $filename, 'public');
-                $files[$i]->move("icons",$filePath);
-               }
-               PoolFeatures::create([
+               
+               for($i=0;$i<count($feature_id);$i++){
+               
+               PoolFeatures::firstOrCreate([
                'pool_id'        =>$id,
-               'feature_title'  => $feature_title[$i],
-               'feature_value'  => $feature_value[$i],
-               'feature_icon'   => $filename
+               'feature_id'  => $feature_id[$i],
+               'feature_value'=> $feature_value[$i]
                ]);
    
                }
@@ -193,8 +195,13 @@ class PoolController extends Controller
         $formattedEvents=array();
         $available_date= array();
         $i=0;
+       
         foreach($events as $event){
-            $available_date[$i]=$event->date_available;
+           
+            
+           
+            
+            $available_date[$i]=array('date'=>$event->date_available,'slot_id'=> $event->slot_id);
             $formattedEvents[$i]=array(
             'title' => '',
             'start' => $event->date_available,
@@ -204,62 +211,57 @@ class PoolController extends Controller
             'backgroundColor'=>"#20c997");
             $i++;
         } 
+        $newarr= array();
+        foreach($available_date as $ad)
+        {
+            if (!array_key_exists($ad['date'],$newarr)){
+            $newarr[$ad['date']]=array('date'=>$ad['date'],'day'=>$ad['slot_id']==1?1:0,'night'=>$ad['slot_id']==2?1:0);
+            }
+            else{
+                if($ad['slot_id']==1){
+                    $newArr[$ad['date']]['day']=1;
+                }
+                else{
+                    $newArr[ad['date']]['night']=1;
+                } 
+            }
+        }
         $data['event'] = $formattedEvents;
-        $data['available_date']=$available_date;
-        //echo "<pre>";print_r($data['event']);die();
+        $data['available_date']=array_values($newarr);
         return view('owner.pool.schedule',$data);
     }
-    public function scheduleAction(Request $request)
+    public function scheduleAction(Request $request,$id)
     {
-        //dd($request->all());
+      
+        $pool_id = $request->pool_id;
         $available_date = $request->available_date;
-        $available_date = explode(",",$available_date);
-        $days = ($request->day)?$request->day:array();
-        $nights = ($request->night)?$request->night:array();
-        if(($available_date[0])==""){
-            $available_date=array_unique (array_merge ($days, $nights));
-        }
-      // dd(($available_date));
+        
+        $available_date = json_decode($available_date);
+       
         $data = array();
         $i=0;
         foreach($available_date as $ad)
         {
-            $data=array('pool_id'=>$request->pool_id,'date_available'=>$ad);
-            $item = PoolSchedule::firstOrNew($data);
-          //  dd($item->id);
+            $data=array('pool_id'=>$pool_id,'date_available'=>$ad->date_available);
+            $item = PoolSchedule::firstOrCreate($data);
+            //dd($item->id);
             $item->save();
-            
+           // PoolScheduleSlots::where('schedule_id',$item->id)->delete();
             if($item->id)
             {
-                PoolScheduleSlots::where("schedule_id",$item->id)->delete();
+               
+                if($ad->night==1)
+                {
+                     PoolScheduleSlots::Create(array("slot_id"=>2,"schedule_id"=>$item->id));
+                }
+                if($ad->day==1){
+                     PoolScheduleSlots::Create(array("slot_id"=>1,"schedule_id"=>$item->id));
+                }
+               
+                
             }
         }
-        //die();
-        
-       // PoolScheduleSlots::truncate();
-        if($days){
-        foreach($days as $day)
-        {
-            
-            $schedule_id = PoolSchedule::where('date_available',$day)->select('id')->first();
-           if(isset($schedule_id)){
-            //PoolScheduleSlots::where("schedule_id",$schedule_id->id)->where('slot_id',1)->delete();
-            $item= PoolScheduleSlots::firstOrNew(array("schedule_id"=>$schedule_id->id,"slot_id"=>1));
-            $item->save();
-        }
-        }
-    }
-    if($nights){
-        //dd($nights);
-        foreach($nights as $night)
-        {
-            $schedule_id = PoolSchedule::where('date_available',$night)->select('id')->first();
-            if(isset($schedule_id)){
-            $item= PoolScheduleSlots::firstOrNew(array("schedule_id"=>$schedule_id->id,"slot_id"=>2));
-            $item->save();
-        }
-        }
-    }
+       
         return redirect(route('owner.pools.schedule',$request->pool_id))->with('success',"Schedule is saved successfully.");
     }
     public function deleteimg($id="")

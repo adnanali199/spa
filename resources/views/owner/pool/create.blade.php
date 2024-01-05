@@ -157,26 +157,42 @@
                             </div>
 
                             <div class="feature mb-2">
-                               
-                                @if($pool && $features)
+                               <div class="row">
+                                <div class="col-md-4">
+                                    <label>{{__('Feature Name')}}</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{__('Feature Value')}}</label>
+                                </div>
+                                </div>
+                                
+                               </div>
+                                @if($pool && count($features1)>0)
                                 <?php $i=0;  ?>
-                                @foreach($features as $feature)
+                                @foreach($features1 as $feature1)
+                                
                                 <div class="row">    
-                                    <div class="col-md-4 mt-1">
-                                        <input type="text" name="feature_title[]" value="{{$feature->feature_title}}" placeholder="{{__('Title')}}" class="form-control">
-                                        </div>
-                                        <div class="col-md-3 mt-1">
-                                        <input type="number" min=0 name="feature_value[]" value="{{$feature->feature_value}}" placeholder="{{__('Value')}}"  class="form-control">
-                                        </div>
-                                        <div class="col-md-3 mt-1">
-                                            <input type="file" name="feature_icon[]" class="form-control">
-                                            <img src="{{ asset('icons/'.$feature->feature_icon) }} "  class="mt-2 img img-responsive img-thumbnail" width="50px" >
-                                        </div>
-                                        <div class="col-md-2 mt-1 text-center">
+                                    <div class="col-4 mt-1">
+                                        <select name="feature_id[]" class="select2  form-control">
+                                            @foreach($features as $feature)
+                                            <option value="{{$feature->id}}" @if($feature->id==$feature1->feature_id) selected @endif>
+                                            {{$feature->feature_title}}
+                                            </option>
+                                            @endforeach
+                                           </select>
+                                    </div>
+                                    <div class="col-4 mt-1">
+                                        <input type="number" min="0" step="1" name="feature_value[]" value="{{$feature1->feature_value}}" class="  form-control"
+                                        placeholder="{{__('Feature Value')}}">
+                                          
+                                    </div>
+                                        
+                                        <div class="col-2 mt-1 text-center">
                                             @if($i==0)
                                             <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
+                                            @else
+                                            <span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span>
                                             @endif
-                                            <span class="btn btn-sm btn-danger remove_feature"><i class="fa fa-trash"> </i></span>
                                         </div>
                                     </div>
                                     @php 
@@ -185,171 +201,28 @@
                                 @endforeach
                                 @else
                                 <div class="row">    
-                                <div class="col-md-4 mt-1">
-                                    <input type="text" name="feature_title[]" class="form-control">
+                                    <div class="col-md-4 mt-1">
+                                        <select name="feature_id[]" class="select2 form-control">
+                                            @foreach($features as $feature)
+                                            <option value="{{$feature->id}}">
+                                            {{$feature->feature_title}}
+                                            </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-3 mt-1">
-                                    <input type="number" min=0 name="feature_value[]" class="form-control">
+                                    <div class="col-4 mt-1">
+                                        <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control"
+                                        placeholder="{{__('Feature Value')}}">
+                                          
                                     </div>
-                                    <div class="col-md-3 mt-1">
-                                        <input type="file" name="feature_icon[]" class="form-control">
-                                    </div>
+                                    
                                     <div class="col-md-2 mt-1 text-center">
                                         <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
                                     </div>
                                 </div>
                                 @endif
-                            </div>
-                            <!--
-                            <div class="row mb-3">
-                                
-                                    
-
-                                <div class="col-md-4">
-                                    <label>Anteroom</label>
-                                <input type="number" min=0 step=1 name="anteroom" class="form-control @error('anteroom') is-invalid @enderror"
-                                       placeholder="{{ __('anteroom') }}"
-                                       value={{    ($pool)?$pool->anteroom:old('anteroom') }} 
-                                        autocomplete="anteroom" >
-                               
-                                @error('anteroom')
-                                <span class="error invalid-feedback">
-                                    {{ $message }}
-                                </span>
-                                @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label>Bathrooms </label>
-                                    <input type="number" min=0 step=1 name="bathroom" class="form-control @error('bathroom') is-invalid @enderror"
-                                           placeholder="{{ __('bathroom') }}"
-                                           value={{    ($pool)?$pool->bathroom:old('bathroom') }} 
-                                            autocomplete="bathroom" >
-                                   
-                                    @error('bathroom')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Shower</label>
-                                    <input type="number" min=0 step=1 name="shower" class="form-control @error('shower') is-invalid @enderror"
-                                           placeholder="{{ __('shower') }}"
-                                           value={{    ($pool)?$pool->shower:old('shower') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('shower')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>BBQ</label>
-                                    <input type="number" min=0 step=1 name="bbq" class="form-control @error('bbq') is-invalid @enderror"
-                                           placeholder="{{ __('bbq') }}"
-                                           value={{    ($pool)?$pool->bbq:old('bbq') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('bbq')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Bedrooms</label>
-                                    <input type="number" min=0 step=1 name="bedrooms" class="form-control @error('bedrooms') is-invalid @enderror"
-                                           placeholder="{{ __('bedrooms') }}"
-                                           value={{    ($pool)?$pool->bedroom:old('bedrooms') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('bedrooms')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Guests Allowed</label>
-                                    <input type="number" min=0 step=1 name="guests_allowed" class="form-control @error('guests_allowed') is-invalid @enderror"
-                                           placeholder="{{ __('guests_allowed') }}"
-                                           value={{    ($pool)?$pool->guests_allowed:old('guests_allowed') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('guests_allowed')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Kids Games</label>
-                                    <input type="number" min=0 step=1 name="kids_games" class="form-control @error('kids_games') is-invalid @enderror"
-                                           placeholder="{{ __('kids_games') }}"
-                                           value={{    ($pool)?$pool->kids_games:old('kids_games') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('kids_games')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Kids Pool</label>
-                                    <input type="number" min=0 step=1 name="kids_pools" class="form-control @error('kids_pools') is-invalid @enderror"
-                                           placeholder="{{ __('kids_pools') }}"
-                                           value={{    ($pool)?$pool->kids_pools:old('kids_pools') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('kids_pools')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Kitchen</label>
-                                    <input type="number" min=0 step=1 name="kitchen" class="form-control @error('kitchen') is-invalid @enderror"
-                                           placeholder="{{ __('kitchen') }}"
-                                           value={{    ($pool)?$pool->kitchen:old('kitchen') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('kitchen')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Stereo</label>
-                                    <input type="number" min=0 step=1 name="stereo" class="form-control @error('stereo') is-invalid @enderror"
-                                           placeholder="{{ __('stereo') }}"
-                                           value={{    ($pool)?$pool->stereo:old('stereo') }} 
-                                            autocomplete="length" >
-                                   
-                                    @error('stereo')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>TV</label>
-                                    <input type="number" min=0 step=1 name="tv" class="form-control @error('tv') is-invalid @enderror"
-                                           placeholder="{{ __('tv') }}"
-                                           value={{    ($pool)?$pool->tv:old('tv') }} 
-                                            autocomplete="length" autofocus>
-                                   
-                                    @error('tv')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                    @enderror
-                                    </div>
-
-                            </div>-->
+                         
+                            
 
                             <div class="row mb-3">
                                 <label class="col-md-12 py-2 border-bottom bg-info">Land Size</label>
@@ -401,7 +274,7 @@
                             </div>
                             <div class="row mb-3">
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label>Normal Price(BHD)</label>
                                 <input type="number" min=0 step=0.1 name="price" class="form-control @error('price') is-invalid @enderror"
                                        placeholder="{{ __('Normal Price(BHD)') }}"
@@ -414,12 +287,12 @@
                                 </span>
                                 @enderror
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label>Holiday Price(BHD) </label>
                                     <input type="number" min=0 step=0.1 name="holiday_price" class="form-control @error('holiday_price') is-invalid @enderror"
                                            placeholder="{{ __('Holiday Price(BHD)') }}"
                                            value={{    ($pool)?$pool->holiday_price:old('holiday_price') }} 
-                                            autocomplete="holiday_price" autofocus>
+                                            >
                                    
                                     @error('holiday_price')
                                     <span class="error invalid-feedback">
@@ -427,6 +300,19 @@
                                     </span>
                                     @enderror
                                     </div>
+                                    <div class="col-md-4">
+                                        <label>Advance Price(BHD) </label>
+                                        <input type="number" min=0 step=0.1 name="advance_price" class="form-control @error('advance_price') is-invalid @enderror"
+                                               placeholder="{{ __('Advance Price(BHD)') }}"
+                                               value={{    ($pool)?$pool->advance_price:old('advance_price') }} 
+                                                >
+                                       
+                                        @error('advance_price')
+                                        <span class="error invalid-feedback">
+                                            {{ $message }}
+                                        </span>
+                                        @enderror
+                                        </div>
 
                             </div>
                             <div class="row mb-3">
@@ -556,7 +442,7 @@
      $(document).ready(function(){
             $(".remove_feature").click(function(){
                 alert();
-                    $(this).parent().remove();
+                    $(this).parent().parent().remove();
             });
         });
     /*$('textarea').tinymce({ height: 400,
@@ -572,46 +458,40 @@
      */       
             $(".add_feature").click(function(){
                 var append = '<div class="row mt-1">'+   
-                             '<div class="col-md-4 mt-1">'+
-                                    '<input type="text" name="feature_title[]" class="form-control">'+
-                                    '</div>'+
-                                    '<div class="col-md-3 mt-1">'+
-                                    '<input type="number" min=0 name="feature_value[]" class="form-control">'+
-                                    '</div>'+
-                                    '<div class="col-md-3 mt-1">'+
-                                    '<input type="file" name="feature_icon[]" class="form-control">'+
-                                    '</div>'+
-                                    '<div class="col-md-2 mt-1 text-center">'+
-                                    '<span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span>'+
-                                    '</div>'+
-                                '</div>';
+                             '<div class="col-4 mt-1">'+
+                             '<select name="feature_id[]" class="select2 form-control">';
+                                        
+                                    @foreach($features as $feature)
+                                    append +='<option value="{{$feature->id}}">{{$feature->feature_title}}</option>';
+                                    @endforeach
+                                   append+='</select> </div> <div class="col-4 mt-1"> <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control" placeholder="{{__('Feature Value')}}"> </div><div class="col-2 mt-1 text-center"><span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span></div></div>';
                 $(".feature").append(append);
             });
            function remove(ele)
            {
             $(ele).parent().parent().remove();
            }
-            $(".delete").click(function(){
-            var href = $(this).data('href');
-        Swal.fire({
-  title: "Are you sure?",
-  text: "You won't be able to revert this!",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Yes, delete it!"
-}).then((result) => {
-  if (result.isConfirmed) {
-    Swal.fire({
-      title: "Deleted!",
-      text: "Your file has been deleted.",
-      icon: "success"
-    });
-    window.location.href=href;
-  }
-});
-        });
-       
+                        $(".delete").click(function(){
+                        var href = $(this).data('href');
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                        });
+                        window.location.href=href;
+                    }
+                    });
+                    });
+                
   </script>
 @endsection

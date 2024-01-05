@@ -40,7 +40,7 @@ h6{
         
         <div class="row">
         <div class="col-6 col-xs-6 col-md-6">{{ $pool->short_name }}</div>
-        <div class="col-6 col-xs-6 col-md-6  text-right text-danger">STARTING FROM: $ {{ number_format($pool->price,2) }}</div>
+        <div class="col-6 col-xs-6 col-md-6  text-right text-danger">{{ __('STARTING FROM:') }} $ {{ number_format($pool->price,2) }}</div>
         <div class="col-md-12 mt-4"><i class="fa fa-map-marker text-primary" aria-hidden="true"></i>  {{ $pool->city }}</div>
         </div>
     </div>
@@ -48,7 +48,7 @@ h6{
         <section>
             <div class="row px-3">
                 <div class="col-md-12 ">
-                <h4>Features</h4>
+                <h4>{{__('Features')}}</h4>
                 
                 
                 </div>
@@ -63,17 +63,17 @@ h6{
             </div>
             <div class="row px-3">
                <div class="col-md-12">
-                <h3 style="margin-bottom:10px">Price Details </h3>
+                <h3 style="margin-bottom:10px">{{__('Price Details')}} </h3>
                </div>
-                <div class="col-6 col-xs-6">Normal Price:</div>
+                <div class="col-6 col-xs-6">{{__('Normal Price:')}}</div>
                 <div class="col-6 col-xs-6 text-right"><strong>{{ $pool->price??0.00 }} BHD</strong></div>
                 
-                    <div class="col-6 col-xs-6">Down Payment:</div>
+                    <div class="col-6 col-xs-6">{{ __('Down Payment:') }}</div>
                     <div class="col-6 col-xs-6 text-right"><strong> 10 BHD </strong>   
                </div>
                 
                 
-                    <div class="col-6 col-xs-6">Holiday Price:</div>
+                    <div class="col-6 col-xs-6">{{__('Holiday Price:')}}</div>
                     <div class="col-6 col-xs-6 text-right"><strong> {{ $pool->holiday_price??0.00 }} BHD </strong>   
                </div>
 
@@ -81,7 +81,8 @@ h6{
         </div>
         <div class="row px-3 pt-3">
             <div class="col-md-12">
-             <h3 style="margin-bottom:10px">ADDRESS: </h3>
+             <h3 style="margin-bottom:10px">{{__('ADDRESS:')}}</h3>
+             <p> {{$pool->street }} {{ $pool->city  }} {{ ",".$pool->state }}</p>
             </div>
              <div class="col-xs-12" id="map">
 

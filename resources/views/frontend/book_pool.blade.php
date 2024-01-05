@@ -1,14 +1,136 @@
 @extends('frontend.layouts.app')
+@section('styles')
+<style>
+ 
+.disabled{
+    background-color:rgba(251, 56, 56, 0.744)!important;
+}
+.nightavailable{
+    background-color:rgba(255, 181, 44, 0.767);
+}
+.dayavailable{
+    background-color:#5353ff;
+    color:#FFF;
+}
+.dayavailable span{
+    color:#FFF!important;
+}
+#d-picker-days div{
+    font-size:16px;
+  text-align:center;
+  transition:all 0.5s ease-in-out;
+}
+#d-picker-days div.active span{
 
+  color:red;
+  font-family:'arial';
+
+
+}
+
+#d-picker-days div.active{
+  font-weight:bold;
+  border:1px solid #aaa!important;
+  border-radius:50px;
+  width:60px!important;
+  height:60px;
+ 
+}
+.d-picker-outer ul li span{
+  display:block;
+  color:#8d8d8d;
+
+  font-size:14px;
+  margin:10px 0;
+}
+
+.d-picker-outer ul li.active span{
+  display:block;
+  color:red;
+  font-family:'arial';
+  font-size:18px;
+  margin:5px 0;
+}
+
+.d-picker-outer ul li.active{
+  font-size:26px;
+  width:100px;
+}
+@media screen and (max-width:600px)
+{
+    #d-picker-days div.active{
+  border-radius:50px;
+  width:40px!important;
+  height:40px;
+  padding:2px!important;
+ 
+}
+#d-picker-days div{
+    padding:0px!important;
+    font-size:12px!important;
+}
+}
+</style>
+@endsection
 @section('content')
 <div class="container">
-<h1 class="my-3 mt-5 mx-auto text-center">{{$pool->pool_name}}</h1>
+<h3 class="my-1 mt-5 mx-auto text-center">{{$pool->pool_name}}</h3>
 <hr>
-<div class="row py-5">
+<div class="row py-3">
     
-  
+    <div class="col-md-12">
+        
+        <form action="{{route('pool.addToCart')}}" method="POST">
+            @csrf
+            <input type="hidden" name="pool_id" id="pool_id" value="{{$pool->id}}">
+            <input type="hidden" name="user_id" value="0">
+            @auth
+            <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
+            @endauth
+           
+            <input type="hidden" name="owner_id" id="owner_id" value="{{$pool->owner_id}}">
+            <input  id="booking_date" name="booking_date" value="<?php echo date('Y-m-d') ?>"  type="hidden"  />
+            <div class="form-group" id="step1">
+                <div class="mb-3" >
+                    <div class="">
+                    <div class="d-picker-inner">
+                       <div class="row">
+                       <div class="col-6 d-picker-btn-group text-left">
+                        <span class="mr-2 btn  cmbtn  btn-primary btn-sm" style="" id="bmbtn" data-title="previous"> < </span>
+                        <span class=" text-center" id="current_month_title">
+                
+                        </span>
+                        <span class="ml-2 btn  cmbtn btn-primary btn-sm" id="nmbtn" data-title="next" style=""> > </span>
+                       </div>
+                       <div class="col-6 text-right">
+                        <span class="btn cmbtn btn-sm btn-warning d-none" id="cmbtn" data-title="current">current</span>
+                        <button type="submit" class="btn  btn-sm btn-primary" id="cartbtn" title="Add to cart"><i class="fas fa-cart-plus"></i> </button>
+                           
+                        <input type="submit" name="submit"  class="btn  btn-sm btn-success"  title="Proceed To checkout" value="Book">
+                    
+                    </div>
+                    </div>
+                        <input type="hidden" id="current_month" data-name="" value="">
+                        <input type="hidden" id="next_month" data-year=""    data-name="" value="">
+                        <input type="hidden" id="prev_month" data-year=""   data-name="" value="">
+                        <div id="d-picker-months"></div>
+                        <div class="slider1" id="d-picker-days"></div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-group row slots">
+              
+           
+                </div>
+            </div>
+            
     
- <div class="col-sm-6">
+            
+        </form>
+    
+     </div> 
+    
+ <div class="col-sm-12">
   
     <div class="card ">
         <div class="card-body p-0">
@@ -64,6 +186,7 @@
             <div class="row px-3 pt-3">
                 <div class="col-md-12">
                  <h3 style="margin-bottom:10px">ADDRESS: </h3>
+                 <p> {{$pool->street }} {{ $pool->city  }} {{ ",".$pool->state }}</p>
                 </div>
                  <div class="col-xs-12" id="map">
     
@@ -96,175 +219,248 @@
     </div>
 
 </div>
- <div class="col-md-6">
-    <h3>Booking Form </h3>
-    <hr>
-    <form action="{{route('pool.bookaction')}}" method="POST">
-        @csrf
-        <input type="hidden" name="pool_id" id="pool_id" value="{{$pool->id}}">
-        <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
-        <input type="hidden" id="owner_id" value="{{$pool->owner_id}}">
-        <div class="form-group">
-            <input class="datepicker1 form-control readonly" readonly autocomplete="off" id="booking_date" name="booking_date" value="<?php echo date('Y-m-d') ?>"  type="text" placeholder="Booking Date" required />
-        </div>
-        <!-- Day/Night -->
-        <div class="form-group row slots">
-        
-       
-        </div>
-        <!-- /Day/Night -->
-        <!-- Day/Night -->
-        <div class="form-group row">
-            <div class="col-md-6">
-                <label>
-                    IBAN <input type="radio"  name="payment_mode" class="payment_mode" value="iban">
-                </label>
-            </div>
-            <div class="col-md-6">
-                <label>
-                    Credit Card <input type="radio" name="payment_mode" class="payment_mode" value="credit_card">
-                </label>
-            </div>
-            </div>
-            <div class="row d-none" id="iban_show">
-                <div class="col-12">
-                    <div class="form__div">
-                        <input type="text" readonly name="iban" id="iban_field" class="form-control" placeholder="IBAN ">
-                        <label for="" class="form__label">IBAN <span class="text-right"> <span id="copy_iban" class="mt-2 btn btn-sm btn-success d-none">Copy IBAN</span></span></label>
-                    </div>
-                   
-                </div>
-            </div>
-            <div class="row d-none" id="card_show">
-                <div class="col-12">
-                    <div class="form__div">
-                        <input type="text" class="form-control" placeholder=" " name="card_number">
-                        <label for="" class="form__label">Card Number</label>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="form__div">
-                        <input type="text" class="form-control" placeholder=" " name="mm/yy">
-                        <label for="" class="form__label">MM / yy</label>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="form__div">
-                        <input type="password" class="form-control" placeholder=" " name="cvv_code">
-                        <label for="" class="form__label">cvv code</label>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="form__div">
-                        <input type="text" name="name_on_card" class="form-control" placeholder=" ">
-                        <label for="" class="form__label">name on the card</label>
-                    </div>
-                </div>
-                
-            </div>
-
-        <div class="text-center">
-            <button disabled id="submit_btn" class="w-full  btn  btn-info btn-lg">Proceed</button> 
-
-        </div>
-    </form>
-
- </div>
+ 
 </div>
+
+
 </div>
+
+
 </div>
+
 @endsection
 
 @section('scripts')
+
 <script>
-$(document).ready(function(){
+   // Month array
+   var monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
+   // unavailable dates 
+   var unavailableDates = `<?php echo json_encode($dates); ?>`;
+   var daysAvailable = `<?php echo json_encode($nightsbooked); ?>`;
+   var nightsAvailable = `<?php echo json_encode($daysbooked); ?>`;
 
-    owner_id = $("#owner_id").val();
-        $.ajax( {
-            url: "{{route('getOwnerIBAN')}}",
-            data:  {
-                owner_id:owner_id
-            },
-            success:function(result){
-              
-               $("#iban_field").val(result.iban);
-
-            }
-        });
-    
-    $("#booking_date").change(function(){
-        var booking_date= $(this).val();
-        if(booking_date)
+   // get next month dates.
+    function firstOfNextMonth(date)
+    {
+      
+        const today = new Date(date);
+        // Get next month's index(0 based)
+        const nextMonth = today.getMonth() + 1;
+        // Get year
+        const year = today.getFullYear() + (nextMonth === 12 ? 1: 0);
+        // Get first day of the next month
+        const firstDayOfNextMonth = new Date(year, nextMonth%12, 1);
+        return firstDayOfNextMonth;
+    }  
+    // get previous month dates
+    function firstOfPrevMonth(date)
+    {
+       var cmonth = new Date();
+                // today's date
+        const today = new Date(date);
+        // Get next month's index(0 based)
+        const nextMonth = today.getMonth() - 1;
+        // Get year
+        const year = today.getFullYear() - (nextMonth === 0 ? 1: 0);
+        // Get first day of the next month
+        const firstDayOfNextMonth = new Date(year, nextMonth%12, 1);
+        if(firstDayOfNextMonth>=cmonth)
         {
-         
+        return firstDayOfNextMonth;
         }
-    });
-    var available_formatted_dates_list = <?php echo json_encode($dates); ?>;
+        else{
+            return cmonth;
+        }
+    }    
+    // get all dates of the current selected month
+    function getAllDatesInMonthUTC(month='',year='') {
+        var row = "";
+        var startDate = new Date(Date.UTC(year, month, 1)); // month is 0-indexed
+         // check if the current month
+        cmonth  = new Date().getMonth();
+       
+        if(month==cmonth)
+        {
+            
+             startDate = new Date(); // month is 0-indexed
+        }    
+        
+        let endDate = new Date(Date.UTC(year, month + 1, 1));
 
-function check_available_date(date) {
+       
+        while (startDate < endDate) {
+            var nextDate = new Date(startDate);
+            var month = String(nextDate.getMonth()+1);
+            var day   = String(nextDate.getDate());
+            month = (month.length<2)?"0"+month:month;
+            day = (day.length<2)?"0"+day:day;
+         
+            var formattedDate = nextDate.getFullYear()+"-"+month+"-"+day;
+            
+            var class1 = 'd-picker-date';
+            
+            if(unavailableDates.includes(formattedDate))
+            {
+                class1 ='disabled';
+            }
+            else if(daysAvailable.includes(formattedDate))
+            {
+                class1='dayavailable';
+            }
+            else if(nightsAvailable.includes(formattedDate))
+            {
+                class1='nightavailable';
+            }
+            var day = nextDate.toLocaleString('default', { weekday: 'short' });
+            row+="<div onclick='dateClick(this)' data-mode='"+class1+"' data-date='"+formattedDate+"' class='ddate "+class1+"' style='padding:10px; border:1px solid #eee '><span style='font-weight:bold;color:#007bff'>"+day+"</span><br>"+nextDate.getDate()+"</div>";
+          
+            
+            startDate.setUTCDate(startDate.getUTCDate() + 1);
+        }
+       
+       $("#d-picker-days").html(row);
+       //getSlots(date_selected);
+    }
 
-  var formatted_date = '',
-    ret = [true, "", ""];
-  if (date instanceof Date) {
-    formatted_date = $.datepicker.formatDate('yy-mm-dd', date);
-  } else {
-    formatted_date = '' + date;
-  }
-  console.log(formatted_date,available_formatted_dates_list)
-  if (-1 === available_formatted_dates_list.indexOf(formatted_date)) {
-    ret[0] = false;
-    ret[1] = "date-disabled";
-    ret[2] = "Date not available";
-  }
-  return ret;
+    function setDate1(date='')
+    {
+        if(date){
+            date = new Date(date);
+        }
+        else{
+            date = new Date();
+        }
+     
+    var month = date.getMonth();
+    var year = date.getFullYear();
+    $("#current_month_title").html("<h5 style='display:inline-block'>"+monthArr[month]+" "+year+"</h5>");
+    
+    getAllDatesInMonthUTC(month,year); 
+   
+    $("#current_month").val(date);
+    
+    next = firstOfNextMonth(date);
+    prev = firstOfPrevMonth(date);
+   
+    $("#next_month").val(next);
+    $("#prev_month").val(prev);
+    }
+    function dateClick(ele){
+        if($(ele).attr('data-mode')=="disabled"){
+            return;
+        }
+        $(".ddate").removeClass('active');
+       $(ele).addClass('active');
+       var date_selected = $(ele).attr('data-date');
+       $("#booking_date").val(date_selected);
+       getSlots(date_selected);
+    }
+
+    function bookMe()
+{
+    var cart = <?php echo json_encode(\Session::get('cart')); ?>;
+    if(cart=="null")
+    {
+        $("#cartbtn").click();
+        setTimeout(() => {
+            window.location.href="{{route('pool.checkout')}}";
+        }, 5000);
+    }
+    else{
+        window.location.href="{{route('pool.checkout')}}";
+    }
+    
 }
 
-$(".datepicker1").change(function(){
+    function getSlots(date)
+    {
+        
     $.ajax( {
             url: "{{route('get_schedule')}}",
             type:"POST",
             data:  {
                 _token:"{{csrf_token()}}",
                 pool_id:$("#pool_id").val(),
-                date:$(this).val()
+                date:date
             },
             success:function(result){
             $("#submit_btn").attr("disabled",true);  
-              $(".slots").empty();
+            $(".slots").empty();
+            var result = result.slots;
+            console.log(result.nightsbooked +" "+date);
               var disable = false;
-               for(r in result)
-               {
-             
-               if(result[r].slot_id==2)
-               {
-                disable=true;
-                var append = '<div class="col-md-6"><label> Night <input type="hidden" name="schedule_id" value="'+result[r].schedule_id+'"><input type="radio" name="slot_id"   class="" value="2"></label></div>';
-               $(".slots").append(append);
-               }
-              else if(result[r].slot_id==1)
+              
+                
+                
+                if(result.unavailable.includes(date))
                {
                 disable=true;
-                var append = '<div class="col-md-6"><label> Day <input type="hidden" name="schedule_id" value="'+result[r].schedule_id+'"><input type="radio" name="slot_id"   class="" value="1"></label></div>';
+                var append = '';
+               $(".slots").remove(append);
+               }     
+               else if(result.daysbooked.includes(date))
+               {
+                disable=true;
+                var append = '<div class="col-md-6 col-6"><label> Night <input required type="checkbox" name="slot_day"   class="radio" value="2"></label></div>';
                $(".slots").append(append);
                }
-            }
+              else if(result.nightsbooked.includes(date))
+               {
+               
+                disable=true;
+                var append = '<div class="col-md-6 col-6 text-center"><label> Day <input required type="checkbox" name="slot_night"   class="radio" value="1"></label></div>';
+               $(".slots").append(append);
+               }
+              
+              else{
+                disable=true;
+                var append = '<div class="col-md-6 col-6 text-center"><label> Day <input type="checkbox" name="slot_day"    class="radio" value="1"></label></div><div class="col-md-6 col-6"><label> Night <input type="checkbox" name="slot_night"   class="radio" value="2"></label></div>';
+                $(".slots").append(append);
+              }
+            
+              
             if(disable)
             {
                 $("#submit_btn").removeAttr("disabled");
             }
             }
         });
+
+    }
+
+
+$(document).ready(function(){
+// call the calendar
+setDate1();
+$(".cmbtn").click(function(){
+   $('.slider1').slick("unslick");
+    var title = $(this).data('title');
+   
+    if(title=="current")
+    {
+        date = new Date();
+    }
+    else if(title=="next")
+    {
+        date = $("#next_month").val();
+        //alert(date);
+    }
+    else{
+        date= $("#prev_month").val();
+    }
+    setDate1(date);
+   
+    startSlick();
+
 });
-    $(".datepicker1").datepicker(
-        {
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: "yy-mm-dd",
-            beforeShowDay: check_available_date
-        }
-    );
+
+
+
+
+   
+
+   
     $(".payment_mode").change(function(){
        
         if($(this).val()=="iban")
@@ -278,21 +474,6 @@ $(".datepicker1").change(function(){
             $("#iban_show").addClass("d-none");
         }
     });
-
-    $("#copy_iban").click(function(){
-        owner_id = $("#owner_id").val();
-        $.ajax( {
-            url: "{{route('getOwnerIBAN')}}",
-            data:  {
-                owner_id:owner_id
-            },
-            success:function(result){
-              
-               $("#iban_field").val(result.iban);
-
-            }
-        });
-    })
 });
 </script>
 @endsection

@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="home" content="{{route('/')}}">
+    <meta name="_token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Pool Booking') }}</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -12,7 +14,7 @@
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="{{asset('css/select2.min.css')}}" rel="stylesheet" />
 
     <style>
          .fc .fc-button{
@@ -22,7 +24,9 @@
         }
         .content-wrapper
         {
-            padding:15px;
+            box-sizing: border-box;
+            padding:0px 20px;
+          
         }
         .select2-container .select2-selection--single{
             height:40px!important;
@@ -125,14 +129,23 @@
 
 <!-- REQUIRED SCRIPTS -->
 
-<link rel="modulepreload" href="{{ asset('build/assets/app-81c4945e.js') }}" />
-<script type="module" src="{{ asset('build/assets/app-81c4945e.js') }}"></script><!-- AdminLTE App -->
+<link rel="modulepreload" href="{{ asset('build/assets/app-83c4400f.js') }}" />
+<script type="module" src="{{ asset('build/assets/app-83c4400f.js') }}"></script><!-- AdminLTE App -->
 
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
-
+<script src="{{ asset('js/jquery.js')}}"></script> 
+<script src="{{asset('js/jquery.validate.js')}}"></script>
+<script src="{{ asset('js/firebase8.3.2.js')}}"></script>
+<script src="{{asset('js/firebase.js')}}"></script>
 @yield('scripts')
+<script>
+    $(document).ready(function(){
+    
+     
+        startFCM();
+      
+    });
+    </script>
 </body>
 </html>

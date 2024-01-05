@@ -138,5 +138,8 @@ $(document).ready(function(){
 });
 </script>
 @yield('scripts') 
+<script>
+  
+    </script>
 </body>
 </html>

@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-
+    <meta name="_token" content="{{ csrf_token() }}">
+    <meta name="home" content="{{route('/')}}">
 
 <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700|Arimo:400,700|Playfair+Display:400,400i,700|Cookie" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="{{asset('frontend/css/bootstrap.css')}}" type="text/css" />
@@ -28,13 +29,19 @@
 <link rel="stylesheet" type="text/css" href="{{asset('frontend/include/rs-plugin/css/navigation.css')}}">
 <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500" rel="stylesheet" />
 <link href="{{asset('frontend/css/searchbar.css')}}" rel="stylesheet" /> 
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" integrity="sha512-yHknP1/AwR+yx26cB1y0cjvQUMvEa2PFzt1c9LlS4pRQ5NOTZFWbhBig+X9G9eYW/8m0/4OXNx8pxJ6z57x0dw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{{asset('css/jquery-ui.css')}}">
+<!--http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css-->
+<link rel="stylesheet" href="{{asset('css/slick.min.css')}}" />
+<!--https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css-->
 <style>
     .ui-widget-content {
     border: 1px solid #dddddd;
     background: #000000!important;
     color: #ec1414!important;
+}
+.radio{
+    height:17px;
+    width:17px;
 }
     .login-page{
         width:40%;
@@ -118,9 +125,13 @@
             #primary-menu{
                 position: absolute;
                 background: #333;
-                padding: 10px;
+                
+                top:100px;
                 left: 0px;
                 width: 100%;
+            }
+            #primary-menu ul{
+                padding:10px!important;
             }
         }
 	</style>
@@ -155,6 +166,20 @@
                     {{ __('Enable Notification') }}
                 </a>
                 <div class="dropdown-divider"></div>
+                @if(Auth::user()->userType->type=="owner")
+                <a href="{{route('owner.home')}}" class="dropdown-item" >
+                    <i class="mr-2 fas fa-home"></i>
+                    {{ __('Dashboard') }}
+                </a>
+                <div class="dropdown-divider"></div>
+                @endif
+                @if(Auth::user()->userType->type=="admin")
+                <a href="{{route('admin.home')}}" class="dropdown-item" >
+                    <i class="mr-2 fas fa-home"></i>
+                    {{ __('Dashboard') }}
+                </a>
+                <div class="dropdown-divider"></div>
+                @endif
                   <form method="POST" action="{{ route('logout') }}">
                       @csrf
                       <a href="#" class="dropdown-item"
@@ -203,9 +228,15 @@
          
       
             </li>
+            @php
+            $cartcount = \Session::get('cart');
+
+            @endphp
+            <li><a href="{{route('pool.checkout')}}" ><i class="fas fa-cart-plus fa-2x" style="font-size: 20px">{{ $cartcount?count($cartcount):0 }} </i></a></li>
         @if (Route::has('login'))
         
             @auth
+            
             <li class=" dropdown">  
             <!-- Right navbar links -->
         
@@ -224,6 +255,20 @@
                     {{ __('Enable Notification') }}
                 </a>
                 <div class="dropdown-divider"></div>
+                @if(Auth::user()->userType->type=="owner")
+                <a href="{{route('owner.home')}}" class="dropdown-item" >
+                    <i class="mr-2 fas fa-home"></i>
+                    {{ __('Dashboard') }}
+                </a>
+                <div class="dropdown-divider"></div>
+                @endif
+                @if(Auth::user()->userType->type=="admin")
+                <a href="{{route('admin.home')}}" class="dropdown-item" >
+                    <i class="mr-2 fas fa-home"></i>
+                    {{ __('Dashboard') }}
+                </a>
+                <div class="dropdown-divider"></div>
+                @endif
                   <form method="POST" action="{{ route('logout') }}">
                       @csrf
                       <a href="#" class="dropdown-item"
@@ -380,11 +425,44 @@
 <script src="{{asset('frontend/include/rs-plugin/js/extensions/revolution.extension.navigation.min.js')}}"></script>
 <script src="{{ asset('frontend/js/choices.js')}}"></script>
 <script src="{{ asset('frontend/js/flatpickr.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js" integrity="sha512-efUTj3HdSPwWJ9gjfGR71X9cvsrthIA78/Fvd/IN+fttQVy7XWkOAXb295j8B3cmm/kFKVxjiNYzKw9IQJHIuQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.js" integrity="sha512-WNZwVebQjhSxEzwbettGuQgWxbpYdoLf7mH+25A7sfQbbxKeS5SQ9QBf97zOY4nOlwtksgDA/czSTmfj4DUEiQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<script src="{{ asset('js/notify.min.js') }}" ></script>
+<!-- https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js -->
+<script src="{{ asset('js/slick.js')}}" ></script>
+<!-- https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.js -->
 <script>
+    function startSlick()
+    {
+        
+        $('.slider1').slick({
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 15,
+        slidesToScroll: 15,
+        autoplay: false,
+        autoplaySpeed: 5000,
+        arrows: false,
+        
+        pauseOnHover:true,
+        responsive: [{
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 6,
+            slidesToScroll: 6
+          }
+        },
+        {
+           breakpoint: 400,
+           settings: {
+              arrows: false,
+              slidesToShow: 6,
+              slidesToScroll: 6
+           }
+        }]
+    });
+    }
  $(document).ready(function(){
+    window.setTimeout( startSlick, 500 );
     @if(session()->has('success'))
         $.notify("{{session()->get('success')}}",'success');
     @endif
@@ -430,60 +508,16 @@
 	</script>
 <!-- The core Firebase JS SDK is always required and must be listed first -->
 
-<script src="https://www.gstatic.com/firebasejs/8.3.2/firebase.js"></script>
-<script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDSo0Bmcn2Y0xLoZzZjgZUH6kRD_PVg50Y",
-      authDomain: "spabooking-f8af7.firebaseapp.com",
-      projectId: "spabooking-f8af7",
-      storageBucket: "spabooking-f8af7.appspot.com",
-      messagingSenderId: "118064225989",
-      appId: "1:118064225989:web:97b0e8b578840414441aac",
-      measurementId: "G-SVYMP9WNRM"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-    function startFCM() {
-        messaging
-            .requestPermission()
-            .then(function () {
-                return messaging.getToken()
-            })
-            .then(function (response) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: '{{ route("save_token") }}',
-                    type: 'POST',
-                    data: {
-                        token: response,
-                        _token:"{{ csrf_token()  }}",
-                    },
-                    dataType: 'JSON',
-                    success: function (response) {
-                        $.notify("Congratulations!Notifications Enabled",'success')
-                    },
-                    error: function (error) {
-                        $.notify(error,'error');
-                    },
-                });
-            }).catch(function (error) {
-                $.notify(error,'error');
-            });
-    }
-    messaging.onMessage(function (payload) {
-        const title = payload.notification.title;
-        const options = {
-            body: payload.notification.body,
-            icon: payload.notification.icon,
-        };
-        new Notification(title, options);
-    });
-</script>
-     
+<script src="{{ asset('js/firebase8.3.2.js')}}"></script>
+<script src="{{asset('js/firebase.js')}}"></script>
 @yield('scripts')
+<script>
+$(document).ready(function(){
+
+ 
+    startFCM();
+  
+});
+</script>
 </body>
 </html>

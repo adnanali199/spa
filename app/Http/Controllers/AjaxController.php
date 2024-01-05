@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Owner;
 use App\Models\Booking;
+use App\Models\Pool;
 use App\Models\PoolSchedule;
 class AjaxController extends Controller
 {
@@ -14,8 +15,11 @@ class AjaxController extends Controller
     {
         $search=$request->search;
         
-        $users = User::where('name','LIKE',"%{$search}%")->join('customers','users.id','=','customers.user_id')
-        ->orWhere('customers.contact_no','LIKE',"%{$search}%") ->orWhere('users.name','LIKE',"%{$search}%")
+        $users = User::join('customers','users.id','=','customers.user_id')
+        ->where('users.phone','LIKE',"%{$search}%")
+        ->orWhere('customers.contact_no','LIKE',"%{$search}%") 
+        ->orWhere('users.name','LIKE',"%{$search}%")
+        ->orWhere('users.cpr','LIKE',"%{$search}%")
         ->where('user_type',"2")->select('users.name','users.id','users.phone','customers.contact_no','users.email','customers.cpr')->get();
         $response=array();
         $i=0;
@@ -40,20 +44,19 @@ class AjaxController extends Controller
             $response['id']=$user->id;
             $response['name']=$user->name;
             $response['phone']=$user->phone;
-            $response['email']=$user->email;
+            $response['cpr']=$user->cpr;
             
         }
         return response()->json($response);
     }
     public function getPoolBookings(Request $request)
     {
+        $newpool = new Pool();
+        $owner_pools =$newpool->ownerPool();
+        
         $pool_ids =array($request->pool_ids);
-        $events =  Booking::join('users','bookings.customer_id','=','users.id')
-        ->join('pools','bookings.pool_id','=','pools.id')
-        ->join('pool_slots','pool_slots.id','=','bookings.slot_id')
-        ->where('pools.owner_id',\Auth::user()->id)->whereIn('pool_id', $pool_ids)
-        ->select('bookings.id','users.name','pools.id as pool_id','pools.pool_name','bookings.booking_date','pool_slots.slot','bookings.status')->orderBy('bookings.id')->get();
-       
+         $booking=new Booking();
+        $events = $booking->getOwnerBooking($pool_ids);
       
         $formattedEvents = array();
         $i=0;
@@ -61,43 +64,45 @@ class AjaxController extends Controller
             
             $slots_taken = array();
            
-          
-            $pool_booking = Booking::where('pool_id',$event->pool_id)->where('booking_date',$event->booking_date) ->join('pool_slots','pool_slots.id','=','bookings.slot_id')->select('booking_date','slot')->groupBy('booking_date')->groupBy('slot')->get();
-            $j=0;
-            foreach($pool_booking as $pb)
+            foreach ($event->pools as $pool )
             {
-                    $slots_taken[$j]=$pb->slot;
-                    $j++;
-            }
-           
-           
-            $formattedEvents[$i]=array(
-            'title' => $event->name." - ".$event->pool_name,
-            'customer_name'=>$event->name,
-            'pool_name'=>$event->pool_name,
-            'slot'=>$event->slot,
-            'start' => $event->booking_date,
-            'end' => $event->booking_date,
-            'backgroundColor'=>"#333",
-            'slots'=>$slots_taken);
-            $i++;
+               
+                if(in_array($pool->id,$pool_ids)){
+                 $formattedEvents[$i]=array(
+                'title' => '',
+                'customer_name'=>$event->name,
+                'booking_id'=>$event->id,
+                'booking_date'=>$pool->pivot->booking_date,
+                'pool_name'=>   $pool->pool_name,
+                'slot'=>        $pool->pivot->slot_id==1?'Day':'Night',
+                'slots'=>$newpool->getSchedules($pool->id,$pool->pivot->booking_date),
+                'start' => $pool->pivot->booking_date,
+                'end' => $pool->pivot->booking_date,
+                'backgroundColor'=>"#333");
+                $i++;
+                 }
         } 
-        
+    }
+      
+    
+
+
+        //$formattedEvents['days1']=$newpool->getSchedules($pool_ids[0]);
         return response()->json($formattedEvents);
     }
 
     // get booking details
 
-    public function getBookingDetail(Request $request)
+    public function getBookingDetail(Request $request,$booking_id)
     {
-        $booking_id =$request->booking_id;
+        
         $bookings = Booking::where('bookings.id',$booking_id)
                 ->join('users','users.id','=','bookings.customer_id')
                 ->join('pool_slots','bookings.slot_id','=','pool_slots.id')
-                ->join('booking_payment','bookings.id','=','booking_payment.booking_id')
+                ->leftjoin('booking_payment','bookings.id','=','booking_payment.booking_id')
                 ->where('bookings.id',$booking_id)
                 ->get(['bookings.*','users.name','users.id as customer_id','pool_slots.slot','booking_payment.payment_mode','booking_payment.card_type','booking_payment.name_on_card','booking_payment.status']);
-       
+      //echo "<pre>";  print_r($bookings);die();
         $response=array();
         foreach($bookings as $booking)
         {
@@ -131,19 +136,22 @@ class AjaxController extends Controller
         $booking_id = $request->booking_id;
         $mode = $request->mode;
         $booking = Booking::find($booking_id);
+        $pool = Pool::find($booking->pool_id);
+        $user_id = $booking->customer_id;
         if($mode=="approve")
         {
         $booking->status=1;
-        $body="Congratulations! Your booking Request approved.";
+        $body="Congratulations! Your booking Request # ". $booking_id ."  approved. Booking Date:".$booking->booking_date;
         }
         else{
             $booking->status=0;
-            $body="Sorry! Your booking Request rejected.";
+            $body="Sorry! Your booking Request # ". $booking_id ."   rejected. Booking Date:".$booking->booking_date;
         }
         $title="Booking Request Status Changed.";
         $booking->save();
         $response=array("response"=>"1");
-        $this->sendNotification($title,$body);
+        $n_status=$this->sendNotification($title,$body,$user_id);
+        $response['n_status']=$n_status;
         return response()->json($response);
     }
     public function changeUserStatus(Request $request)
@@ -163,7 +171,8 @@ class AjaxController extends Controller
         $title="User  Status Changed.";
         $user->save();
         $response=array("response"=>"1");
-        $this->sendNotification($title,$body);
+        $n_status=$this->sendNotification($title,$body,$user_id);
+        $response['n_status']=$n_status['success'];
         return response()->json($response);
     }
     public function saveSchedule(Request $request)
@@ -178,9 +187,9 @@ class AjaxController extends Controller
         
         return response()->json($response);
     }
-    public function sendNotification($title="",$body="")
+    public function sendNotification($title="",$body="",$id)
     {
-        $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
+        $firebaseToken = User::where('id',$id)->whereNotNull('device_token')->pluck('device_token')->all();
           
         $SERVER_API_KEY = 'AAAAG30tHsU:APA91bEvvwMGStcJkiYI4u5uOGlkJSh4cuTNKW6Kp3rTmU1Fs3BVefIJiwaO3oQT9bGc5Ic_WhCxYYTTx65MoBexDB-r-JxN-mxm9lCGNqlqPGU12osXQdXOImLOPMoqWqAkBvnLxeLS';
   
@@ -208,7 +217,7 @@ class AjaxController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                
         $response = curl_exec($ch);
-  
+        return $response;
         
     }
 
@@ -216,9 +225,58 @@ class AjaxController extends Controller
     {
         $pool_id =$request->pool_id;
         $date = $request->date;
-        $events=PoolSchedule::join('pool_schedule_slots','pool_schedules.id','=','pool_schedule_slots.schedule_id')
-        ->where('pool_id',$pool_id)->where('date_available',$date)->where('pool_schedule_slots.status','available')->get();
+        $bookings =\DB::table('bookings')->join('booking_details','booking_details.booking_id','=','bookings.id')
+        ->join('users','users.id','=','bookings.customer_id')
+        ->where('booking_details.pool_id',$pool_id)->where('booking_details.booking_date',$date)->get(['bookings.*','booking_details.*','users.*','bookings.id as booking_id']);
+        $booking_data = array();$i=0;
+        foreach($bookings as $booking)
+        {
+            $booking_data[$i] = array(
+            'booking_id'=>$booking->booking_id,
+            'booking_date'=>$booking->booking_date,
+            'customer_id'=>$booking->customer_id,
+           // 'customer_name'=>$booking->name,
+            'cpr'=>$booking->cpr,
+            'phone'=>$booking->phone,
+            'customer_name'=>$booking->name,
+            'slot_id'=>$booking->slot_id,
+            'booking_type'=>$booking->booking_type,
+            'advance_price'=>$booking->advance_price,'total_price'=>$booking->total_price, 'notes'=>$booking->notes);
+           
+            $i++;
+        }
+        $pool= new Pool();
+        $events['slots']=$pool->getSchedules($pool_id,$date);
+        $events['bookings']=$booking_data;
         return response()->json($events);
 
+    }
+    public function checkUser(Request $request)
+    {
+        //echo "<pre>";print_r($request->all());die();
+        $cpr=$request->cpr?$request->cpr:0;
+        $phone=$request->phone?$request->phone:0;
+        $name=$request->customer_name?$request->customer_name:0;
+        $mode = $request->mode;
+        $phone_exists=array();$cpr_exists=array();$name_exists=array();
+       if(!empty($phone)){
+        $phone_exists=User::where('phone',$phone)->get();
+        //echo "<pre>";print_r($phone_exists);die();
+       }
+       if(!empty($name)){
+       
+       $name_exists=User::where('name','=',$name)->get();//->orWhere('cpr',$cpr)->orWhere('name','=',$name)->get();
+       }
+       if(!empty($cpr)){ 
+       $cpr_exists=User::where(['cpr'=>$cpr])->get();
+       }
+            if(count($phone_exists)>0|| count($name_exists)>0 || count($cpr_exists)>0){
+               // print_r($name_exists);
+                
+                return response()->json(array('status'=>1,'slot'=>$mode));
+            }
+            else{
+                return response()->json(array('status'=>0));
+            }
     }
 }

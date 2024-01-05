@@ -11,7 +11,7 @@ class PoolScheduleSlots extends Model
 {
     protected $table = "pool_schedule_slots";
     protected $fillable = [
-        'schedule_id','slot_id'
+        'schedule_id','slot_id','status'
     ];
     public function Schedule()
     {

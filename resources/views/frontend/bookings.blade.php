@@ -19,21 +19,30 @@ h6{
 <h1 class=" mt-5 mx-auto text-center">{{__('My Bookings')}}</h1>
 <hr>
 <div class="row ">
-    
-  
+    @auth
+   @if($bookings)
     @foreach($bookings as $booking)
    
  <div class="col-md-3">
   
     <div class="card">
         <div class="card-body p-1">
-            <div style="height:150px" class="slider" >
-                @foreach($booking->pool->images as $image)
-                                <img src=" {{ asset('uploads/'.$image->pool_image) }} " width="100%" height="150px" class="img img-responsive">
-                @endforeach       
-            </div>
+            <table class="table">
+                <tr>
+                <th class="col-4">{{ __('Pool') }}</th>
+                <th class="col-4">{{ __('Date')}}</th>
+                <th class="col-4">{{ __('Slot')}}</th>
+                </tr>
+           @foreach ($booking->pools as $pool )
+                <tr>
+                <td class="col-4">{{$pool->pool_name}}</td>
+                <td class="col-4">{{ $pool->pivot->booking_date}}</td>
+                <td class="col-4">{{ ($pool->pivot->slot_id==1)?'Day':'Night' }}</td>
+                </tr>
+               @endforeach
+            </table>
             <h4 class=" mt-2 text-center">
-            {{$booking->pool->pool_name}}
+           
             </h4>
             <?php
             if($booking->status==2)
@@ -48,7 +57,7 @@ h6{
                 $status="<strong class='text-danger'>Rejected</strong>";
             }
             ?>
-            <p class="text-center">{{ date("d M Y",strtotime($booking->booking_date))}} | {{ $booking->slot }} | <?php echo $status; ?></p>
+            <p class="text-center">{{ date("d M Y",strtotime($booking->booking_date))}}  | <?php echo $status; ?></p>
         </div>
         <!-- /.card-body -->
 
@@ -57,6 +66,17 @@ h6{
 
 </div>
  @endforeach
+ @else
+<div class="col-12 text-center">{{ __('No Bookings Yet') }}</div>
+ @endif
+ @else
+ <div class="text-center col-12">
+    <div class="card" style="margin:0px auto">
+        <div class="card-body">
+    <h4> {{ __('Please Login to view your bookings status') }} <h4></div>
+    </div>
+</div>
+ @endauth
 </div>
 </div>
 </div>

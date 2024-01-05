@@ -21,38 +21,40 @@ class OwnerController extends Controller
     //
     public function index()
     {
-        $events =  Booking::join('users','bookings.customer_id','=','users.id')
-        ->join('pools','bookings.pool_id','=','pools.id')
-        ->join('pool_slots','pool_slots.id','=','bookings.slot_id')
-        ->where('pools.owner_id',\Auth::user()->id)
-        ->select('bookings.id','users.name','pools.pool_name','pools.id as pool_id','bookings.booking_date','pool_slots.slot','bookings.status')->orderBy('bookings.id')->get();
         $pools = Pool::paginate()->where('owner_id',Auth::user()->id);
 
+         $owner_pools = array();
+         $i=0;
+         foreach($pools as $pool)
+         {
+            $owner_pools[$i]=$pool->id; 
+            $i++;
+         }
+         //dd($owner_pools);
+        $booking= new Booking();
+        $events =  $booking->getOwnerBooking();
         $formattedEvents = array();
         $i=0;
         foreach($events as $event){
-            $slots_taken = array();
-           
-          
-            $pool_booking = Booking::where('pool_id',$event->pool_id) ->join('pool_slots','pool_slots.id','=','bookings.slot_id')->select('booking_date','slot')->groupBy('booking_date')->groupBy('slot')->get();
-            $j=0;
-            foreach($pool_booking as $pb)
-            {
-                    $slots_taken[$j]=$pb->slot;
-                    $j++;
-            }
-            $formattedEvents[$i]=array(
-            'title' => $event->name." - ".$event->pool_name,
+            foreach ($event->pools as $pool )
+        {
+            if(in_array($pool->id,$owner_pools)){
+             $formattedEvents[$i]=array(
+            'title' => $event->name." - ".$pool->pool_name,
             'customer_name'=>$event->name,
-            'pool_name'=>$event->pool_name,
-            'slot'=>$event->slot,
-          //  'slots'=>$slots_taken,
-            'start' => $event->booking_date,
-            'end' => $event->booking_date,
+            'booking_id'=>$event->id,
+            'booking_date'=>date('Y-m-d',strtotime($pool->pivot->booking_date)),
+            'pool_name'=>   $pool->pool_name,
+            'slot'=>        $pool->pivot->slot_id==1?'Day':'Night',
+            'start' => $pool->pivot->booking_date,
+            'end' => $pool->pivot->booking_date,
             'backgroundColor'=>"#333");
             $i++;
+        }
+    }
         } 
       
+
         return view('owner.home', compact('formattedEvents','pools'));
     }
     public function home()

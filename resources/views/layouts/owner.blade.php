@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_token" content="{{ csrf_token() }}">
+    <meta name="home" content="{{route('/')}}">
     <title>{{ config('app.name', 'Pool Booking') }}</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -12,14 +14,15 @@
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" integrity="sha512-yHknP1/AwR+yx26cB1y0cjvQUMvEa2PFzt1c9LlS4pRQ5NOTZFWbhBig+X9G9eYW/8m0/4OXNx8pxJ6z57x0dw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="{{asset('css/select2.min.css')}}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('css/slick.min.css')}}"  />
 
     <style>
-        body,.content,.content-wrapper
+        .content
         {
             box-sizing: border-box;
-            overflow: hidden;
+            padding:0px 20px;
+          
         }
         .select2-container .select2-selection--single{
             height:40px!important;
@@ -32,7 +35,24 @@
             margin-top:3px;
             
         }
-       
+        .form-control.checkbox{
+            width:20px;
+            display: inline-block;
+        }
+       .fc-dayGridMonth-button,.fc-timeGridWeek-button{
+        display:none!important;
+       }
+       button.nav-link{
+        border-radius: 0px!important;
+    }
+    .nav-link.active{
+        background: #00a75f!important;
+        color:#FFF!important;
+    }
+    .fc-h-event{
+        background-color:rgba(0,0,0,0)!important;
+        border:none!important;
+    }
     </style>
 
     @yield('styles')
@@ -133,9 +153,9 @@
 
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.js" integrity="sha512-WNZwVebQjhSxEzwbettGuQgWxbpYdoLf7mH+25A7sfQbbxKeS5SQ9QBf97zOY4nOlwtksgDA/czSTmfj4DUEiQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ asset('js/jquery.js')}}"></script>  
+<script src="{{asset('js/jquery.validate.js')}}"></script>
+<script src="{{asset('js/slick.js')}}" ></script>
 <script>
     $(document).ready(function(){
        
@@ -143,9 +163,9 @@
         dots: false,
         infinite: true,
         speed: 500,
-        slidesToShow: 1,
+        slidesToShow: 5,
         slidesToScroll: 1,
-        autoplay: true,
+        autoplay: false,
         autoplaySpeed: 2000,
         arrows: false,
         responsive: [{
@@ -159,13 +179,24 @@
            breakpoint: 400,
            settings: {
               arrows: false,
-              slidesToShow: 1,
+              slidesToShow: 2,
               slidesToScroll: 1
            }
         }]
     });
     });
 </script>
+
 @yield('scripts')
+<script src="{{ asset('js/firebase8.3.2.js')}}"></script>
+<script src="{{asset('js/firebase_owner.js')}}"></script>
+<script>
+$(document).ready(function(){
+
+ 
+    startFCM();
+  
+});
+</script>
 </body>
 </html>

@@ -24,9 +24,14 @@ use Illuminate\Support\Facades\Session;
 Route::get('/', [FrontendController::class, 'index'])->name('/');
 Route::get('/home', [FrontendController::class, 'index'])->name('home');
 Route::get('/pool/{id?}', [\App\Http\Controllers\FrontendController::class, 'pool'])->name('pool.details');
-Route::get('/book/pool/{id?}', [\App\Http\Controllers\FrontendController::class, 'bookPool'])->name('pool.book')->middleware('auth');
-Route::post('/book/final', [\App\Http\Controllers\FrontendController::class, 'bookPoolAction'])->name('pool.bookaction')->middleware('auth');
-Route::get('/bookings', [\App\Http\Controllers\FrontendController::class, 'myBookings'])->name('bookings')->middleware('auth');
+Route::get('/book/pool/{id?}', [\App\Http\Controllers\FrontendController::class, 'bookPool'])->name('pool.book');
+Route::post('/book/final', [\App\Http\Controllers\FrontendController::class, 'bookPoolAction'])->name('pool.bookaction');
+Route::post('/book/cart', [\App\Http\Controllers\FrontendController::class, 'addToCart'])->name('pool.addToCart');
+Route::get('/book/checkout/{id?}', [\App\Http\Controllers\FrontendController::class, 'checkout'])->name('pool.checkout');
+Route::get('/book/clearCart/', [\App\Http\Controllers\FrontendController::class, 'clearCart'])->name('pool.clearCart');
+Route::get('/book/removecart/{id?}', [\App\Http\Controllers\FrontendController::class, 'removeCartItem'])->name('pool.removeCartItem');
+
+Route::get('/bookings', [\App\Http\Controllers\FrontendController::class, 'myBookings'])->name('bookings');
 Route::post('/search', [\App\Http\Controllers\FrontendController::class, 'search'])->name('pool.search');
 Route::post('/save_token', [\App\Http\Controllers\FrontendController::class, 'saveToken'])->name('save_token');
 Route::get('/send_notification', [\App\Http\Controllers\FrontendController::class, 'sendNotification'])->name('send_notification');
@@ -56,6 +61,7 @@ Route::middleware(['owner'])->name('owner.')->prefix('owner')->group(function(){
     Route::get("/bookings/list",[BookingController::class,'list'])->name('booking.list');
     Route::get('/booking/{id?}',[BookingController::class,'newBooking'])->name('add-booking');
     Route::post('/booking/{id?}',[BookingController::class,'bookingAction'])->name('bookingaction');
+    Route::post('/sbooking/{id?}',[BookingController::class,'sbookingAction'])->name('sbookingaction');
     Route::get('/booking/delete/{id}',[BookingController::class,'delete'])->name('booking.delete');
 });
 
@@ -70,6 +76,9 @@ Route::middleware(['admin'])->name('admin.')->prefix('admin')->group(function(){
     Route::get("/users/list",[AdminController::class,'userList'])->name('user.list');
     Route::get("/settings",[AdminController::class,'settings'])->name('settings');    
     Route::post('/settings/{id?}',[AdminController::class,'settingsAction'])->name('settingsaction');
+    Route::get("/features/{id?}",[AdminController::class,'features'])->name('features');    
+    Route::post('/features/{id?}',[AdminController::class,'featuresAction'])->name('featuresaction');
+    Route::get('/features/delete/{id?}',[AdminController::class,'featuresDelete'])->name('features.delete');
 });
 Route::get('owner/register',[OwnerController::class,'register'])->name('owner.register');
 Route::post('owner/register',[OwnerController::class,'registerAction'])->name('owner.registeraction');
@@ -84,11 +93,11 @@ Route::post('/login',[CustomerController::class,'loginAction'])->name('clogin');
 Route::middleware(['owner'])->name('ajax.')->prefix('ajax')->group(function(){
     Route::get('/getUsers',[AjaxController::class,'getUsers'])->name('getUsers');
     Route::get('/getUserDetail',[AjaxController::class,'getUserDetail'])->name('getUserDetail');
-    Route::get('/getBookingDetail',[AjaxController::class,'getBookingDetail'])->name('getBookingDetail');
+    Route::get('/getBookingDetail/{booking_id?}',[AjaxController::class,'getBookingDetail'])->name('getBookingDetail');
     Route::get('/pool_bookings',[AjaxController::class,'getPoolBookings'])->name('getPoolBookings');
     Route::get('/get_iban',[AjaxController::class,'getOwnerIBAN'])->name('getIBAN');
     Route::post('/change_booking_status',[AjaxController::class,'changeBookingStatus'])->name('changeBookingStatus');
-   
+    Route::get('/check_user',[AjaxController::class,'checkUser'])->name('check_user');
     Route::post('/get_schedule',[AjaxController::class,'getSlots'])->name('get_schedule');
     
 });
@@ -99,7 +108,7 @@ Route::post('/change_user_status',[AjaxController::class,'changeUserStatus'])->n
 
     Route::get('/get_iban',[AjaxController::class,'getOwnerIBAN'])->name('getOwnerIBAN');
     Route::post('/get_schedule',[AjaxController::class,'getSlots'])->name('get_schedule');
-
+    Route::get('/check_user',[AjaxController::class,'checkUser'])->name('check_user');
    
 
 Route::get('/locale/{locale}', function (Request $request, $locale) {

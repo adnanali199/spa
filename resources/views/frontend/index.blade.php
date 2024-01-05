@@ -14,7 +14,7 @@
 <div class="s002">
     <form method="post" action={{route('pool.search')}}>
       @csrf
-        <fieldset>
+        <fieldset class="mt-4">
             <legend>SEARCH Pool</legend>
           </fieldset>
       <div class="inner-form mt-3">
@@ -62,7 +62,7 @@
     @foreach($pools as $pool)
     
  <div class="col-sm-3">
-    <a href="{{route('pool.details',$pool->id)}}">
+    <a href="{{route('pool.book',$pool->id)}}">
     <div class="card mt-1">
         <div class="card-body p-0">
         <div style="" class="slider">

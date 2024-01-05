@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\Booking;
 use App\Models\Pool;
 use App\Models\Settings;
+use App\Models\Features;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,12 @@ class AdminController extends Controller
     //
     public function index()
     {
-        $events =  Booking::join('users','bookings.customer_id','=','users.id')
-        ->join('pools','bookings.pool_id','=','pools.id')
-        ->join('pool_slots','pool_slots.id','=','bookings.slot_id')
+       // $events =  Booking::join('users','bookings.customer_id','=','users.id')
+        $events = Booking::join('users','bookings.customer_id','=','users.id')
+            ->select('bookings.id','users.name','bookings.status')->orderBy('bookings.id','desc')->get();
+            
         
-        ->select('bookings.id','users.name','pools.pool_name','pools.id as pool_id','bookings.booking_date','pool_slots.slot','bookings.status')->orderBy('bookings.id')->get();
+        
         $pools = Pool::paginate();
         $total_users = User::where('user_type','2')->count();
         $total_owners = User::where('user_type','3')->count();
@@ -37,28 +39,26 @@ class AdminController extends Controller
         $total_pools = Pool::count();
         $formattedEvents = array();
         $i=0;
-        foreach($events as $event){
-            $slots_taken = array();
-           
+       
           
-            $pool_booking = Booking::where('pool_id',$event->pool_id) ->join('pool_slots','pool_slots.id','=','bookings.slot_id')->select('booking_date','slot')->groupBy('booking_date')->groupBy('slot')->get();
-            $j=0;
-            foreach($pool_booking as $pb)
+            foreach($events as $event){
+                foreach ($event->pools as $pool )
             {
-                    $slots_taken[$j]=$pb->slot;
-                    $j++;
-            }
-            $formattedEvents[$i]=array(
-            'title' => $event->name." - ".$event->pool_name,
-            'customer_name'=>$event->name,
-            'pool_name'=>$event->pool_name,
-            'slot'=>$event->slot,
-          //  'slots'=>$slots_taken,
-            'start' => $event->booking_date,
-            'end' => $event->booking_date,
-            'backgroundColor'=>"#333");
-            $i++;
-        } 
+                
+                 $formattedEvents[$i]=array(
+                'title' => $event->name." - ".$pool->pool_name,
+                'customer_name'=>$event->name,
+                'booking_id'=>$event->id,
+                'booking_date'=>date('Y-m-d',strtotime($pool->pivot->booking_date)),
+                'pool_name'=>   $pool->pool_name,
+                'slot'=>        $pool->pivot->slot_id==1?'Day':'Night',
+                'start' => $pool->pivot->booking_date,
+                'end' => $pool->pivot->booking_date,
+                'backgroundColor'=>"#333");
+                $i++;
+            
+        }
+            } 
       
         return view('admin.home', compact('formattedEvents','pools','total_users','total_bookings','total_users_pa','total_owners','total_pools'));
     }
@@ -212,7 +212,7 @@ class AdminController extends Controller
             $data = User::join('user_types','users.user_type','=','user_types.id')
             ->join('customers','customers.user_id','=','users.id')
             //->where('pools.owner_id',"=",\Auth::user()->id)
-            ->select('users.id','users.name','users.email','users.phone','customers.cpr','users.status')->orderBy('users.id','desc ');
+            ->select('users.id','users.name','users.email','users.phone','customers.cpr','users.status')->orderBy('users.id','desc');
 
             return DataTables::of($data)
                     ->addIndexColumn()
@@ -279,5 +279,62 @@ class AdminController extends Controller
         
         return back()->with('success',"Settings added Successfully..");
     }
+    public function features($id=false)
+    {
+       
+        $data['features']=Features::all();
+        if($id)
+        {
+            $data['feature']=Features::find($id);
+        }
+        else{
+            $data['feature']='';
+        }
+        return view('admin.features.create',$data);
+    }   
+    public function featuresAction(Request $request,$id=false)
+    {
+      
+        //validate
+        $request->validate([
+            "feature_title"=>"required",
+           
+           
+        ]);
+
     
+       
+        if($id)
+        {
+            $features = Features::find($id);
+        }
+        else{
+        $features = new Features();
+        }
+        $features->feature_title = $request->feature_title;
+        
+       
+       
+        if($request->hasFile('feature_icon'))
+        {
+            
+            $logo = $request->file('feature_icon');
+            $filename = time().'_'.$logo->getClientOriginalName();
+            $filePath = $logo->storeAs('icons', $filename, 'public');
+            $logo->move("icons",$filePath);
+            $features->feature_icon = $filename;
+            
+        }
+        $features->save();
+        
+        return redirect(route('admin.features'))->with('success',"Features added Successfully..");
+    } 
+    public function featuresDelete(Request $request,$id)
+    {
+        if($id)
+        {
+            Features::where('id',$id)->delete();
+            return back()->with('success',"Features deleted Successfully..");
+        }
+    }
 }

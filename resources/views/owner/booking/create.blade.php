@@ -82,19 +82,7 @@
                                 </span>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label>E-mail</label>
-                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror"
-                                       placeholder="{{ __('email') }}"
-                                       value="{{    ($booking)?$booking->email:old('email') }} "
-                                       required autocomplete="email" autofocus>
-                               
-                                @error('email')
-                                <span class="error invalid-feedback">
-                                    {{ $message }}
-                                </span>
-                                @enderror
-                            </div>
+                        
                             </div>
                             
                             <h3>Booking info</h3>
@@ -194,7 +182,7 @@
                                             </div>
                                             <div class="col-12">
                                                 <div class="form__div">
-                                                    <input type="text" class="form-control" placeholder=" ">
+                                                    <input type="text" id="name_on_card" name="name_on_card" class="form-control" placeholder=" ">
                                                     <label for="" class="form__label">name on the card</label>
                                                 </div>
                                             </div>
@@ -242,7 +230,7 @@ $(document).ready(function(){
                 $("#customer_id").val(result.id);
                 $("#cpr").val(result.cpr);
                 $("#phone").val(result.phone);
-                $("#email").val(result.email);
+              
 
             }
         });

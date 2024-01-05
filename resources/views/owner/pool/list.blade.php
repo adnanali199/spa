@@ -32,19 +32,11 @@
                  <div class="col-sm-3">
                     <div class="card">
                         <div class="card-body p-0">
-                            <div style="" class="slider">
-                                @foreach($pool->images as $image)
-                        
-                                <img src=" {{ asset('uploads/'.$image->pool_image) }} " width="100%" class="img img-responsive" height="175px">
-                                
-                                @endforeach       
-                            </div>
+                           
                             <div class="px-5 py-3 ">
                                 <div class="row">
-                                    <div class="col-12 col-xs-12 col-md-12 text-center"><h4>{{ $pool->short_name }}</h4></div>
-                                    <div class="col-12 col-xs-!2 col-md-12   text-danger">STARTING FROM: $ {{ number_format($pool->price,2) }}</div>
-                                    <div class="col-md-12"><i class="fa fa-map-marker text-primary" aria-hidden="true"></i>  {{ $pool->city }}</div>
-                                    </div>
+                                    <div class="col-12 col-xs-12 col-md-12 text-center"><h5>{{ $pool->pool_name }}</h5></div>
+                                     </div>
                             
                            
 
@@ -56,7 +48,7 @@
                         <div class="card-footer clearfix">
                                                <a href="{{ route('owner.add-pool',$pool->id)}}" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a> 
                                                <a href="#" data-href="{{ route('owner.pools.delete',$pool->id)}}" class="btn btn-sm btn-danger delete" title="Delete"><i class="fa fa-trash"></i></a>
-                                               <a href="{{ route('owner.pools.schedule',$pool->id)}}" class="btn btn-sm btn-success" title="Schedule"><i class="fa fa-calendar"></i></a> 
+                                               <a href="{{ route('owner.pools.schedule',$pool->id)}}" class="btn btn-sm btn-success d-none" title="Schedule"><i class="fa fa-calendar"></i></a> 
       
                         </div>
                     </div>

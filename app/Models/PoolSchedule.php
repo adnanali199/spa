@@ -12,7 +12,7 @@ class PoolSchedule extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'pool_id','date_available','start_time','end_time','status'
+        'pool_id','date_available','start_time','end_time','status','booking_id'
     ];
     public function pool()
     {

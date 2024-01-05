@@ -57,7 +57,7 @@
                         <form method="POST" action="{{ route('owner.scheduleAction',$pool->id??0) }}" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="pool_id" value="{{$pool->id}}">
-                            <input type="hidden" name="available_date" id="available_date" value="{{ implode(",",$available_date) }}">
+                            <input type="hidden" name="available_date" id="available_date" value="{{ json_encode($available_date) }}">
                             <div class="mb-3">
                                 <div class="col-lg-12">
                                     <div class="card">
@@ -89,7 +89,7 @@
 
 <script>
     var selected =[];
-    var selected_data = [];
+    var selected_data = <?php echo json_encode($available_date) ?>;
     function getDatesBetween(startDate, endDate) {
   const currentDate = new Date(startDate.getTime());
   const dates = [];
@@ -105,10 +105,11 @@
 }
 
     $(document).ready(function(){
+      console.log(selected_data);
        var events= <?php echo json_encode($event) ?>;
         loadCalendar(events);
     });
-    
+   
     // function loading the calendar
 function loadCalendar(event) {
  
@@ -125,33 +126,45 @@ function loadCalendar(event) {
             $("#booking_date").val(info.dateStr);
             var available_date = $("#available_date").val();
             index = selected.indexOf(info.dateStr);
-            var append = '<div class="selected" id="'+id+'"><label> D <input data-date="'+id+'" id="day_'+id+'" type="checkbox" class="checkbox" name="day[]" value="'+id+'" checked /> </label> <label> N <input data-date="'+id+'" name="night[]" id="night_'+id+'"  type="checkbox" class="checkbox" value="'+id+'" checked /> </label> </div>';
+            var append = '<div class="selected" id="'+id+'"><label> D <input data-mode="day" data-date="'+id+'" id="day_'+id+'" type="checkbox" class="checkbox" name="day[]" value="'+id+'" checked /> </label> <label> N <input data-date="'+id+'" data-mode="night" name="night[]" id="night_'+id+'"  type="checkbox" class="checkbox" value="'+id+'" checked /> </label> </div>';
             $('#'+id +" .checkbox").change(function() 
             {
-               
-                var slot = $(this).val(); 
-                var data_obj = {id:id,slot:slot};
-                if($(this).is(":checked"))
-                 {       
+              var mode = $(this).attr('data-mode');
+              var date = $(this).attr('data-date');
+             if($(this).is(":checked"))
+             {
+              for(i=0;i<selected_data.length;i++)
+              {
+                if(selected_data[i].date_available==date)
+                {
+                  if(mode=="day"){
+                  selected_data[i].day =1;
+                  }
+                  else{
+                    selected_data[i].night =1;
+                  }
+                }
                 
-                var index = selected_data.indexOf(data_obj); 
-                const newArr = available_date.filter(object => {
-                                return object.id !== 3;
-                                });           
-                        if (index > -1) {
-                            selected_data.splice(index, 1);
-                        }
-                        else{
-                            selected_data.push({data_obj});
-                        }
-                      }   
-     	        else{
-                    var index = selected_data.indexOf({id,slot});            
-                        if (index > -1) {
-                            selected_data.splice(index, 1);
-                        }
-                      }  
-                      console.log(selected_data);
+              }
+             }
+             else{
+              
+              for(i=0;i<selected_data.length;i++)
+              {
+                if(selected_data[i].date_available==date)
+                {
+                  if(mode=="day"){
+                  selected_data[i].day =0;
+                  }
+                  else{
+                    selected_data[i].night =0;
+                  }
+                }
+                
+              }
+             }
+             $("#available_date").val(JSON.stringify(selected_data));
+             console.log(selected_data);
               });
            
             if(index!=-1)
@@ -160,12 +173,19 @@ function loadCalendar(event) {
                // $('#'+id).remove();
             }
             else{
+              var data={
+                'date_available':info.dateStr,
+                'day':1,
+                'night':1
+              }
             selected.push(info.dateStr);
-            console.log(selected);
+            selected_data.push(data);
+            console.log(selected_data);
             cell.append(append);
-            }
+             
+          }
             
-         $("#available_date").val(selected);
+         $("#available_date").val(JSON.stringify(selected_data));
          return false;
   },
 
