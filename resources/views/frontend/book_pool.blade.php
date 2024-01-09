@@ -167,13 +167,13 @@
                 </div>
                 <div class="row px-3">
                    <div class="col-md-12">
-                    <h3 style="margin-bottom:10px">Price Details </h3>
+                    <h3 style="margin-bottom:10px">{{__('Price Details')}} </h3>
                    </div>
-                    <div class="col-6 col-xs-6">Normal Price:</div>
+                    <div class="col-6 col-xs-6">{{__('Normal Price:')}}</div>
                     <div class="col-6 col-xs-6 text-right"><strong>{{ $pool->price??0.00 }} BHD</strong></div>
                     
-                        <div class="col-6 col-xs-6">Down Payment:</div>
-                        <div class="col-6 col-xs-6 text-right"><strong> 10 BHD </strong>   
+                        <div class="col-6 col-xs-6">{{__('Down Payment:') }}</div>
+                        <div class="col-6 col-xs-6 text-right"><strong> {{ $pool->advance_price ?? 0.00}} BHD</strong>   
                    </div>
                     
                     
@@ -273,6 +273,28 @@
             return cmonth;
         }
     }    
+    // check if there is holiday
+    function isHoliday(date,slot)
+    {
+        date = new Date(date);
+        var day = date.getDay();
+        console.log(day +" "+slot );
+        if(day==4 && slot=="2")
+        {
+            return 1;
+        }
+        else if(day==5)
+        {
+            return 1;
+        }
+        else if(day==6 && slot==1)
+        {
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
     // get all dates of the current selected month
     function getAllDatesInMonthUTC(month='',year='') {
         var row = "";
@@ -402,20 +424,21 @@
                else if(result.daysbooked.includes(date))
                {
                 disable=true;
-                var append = '<div class="col-md-6 col-6"><label> Night <input required type="checkbox" name="slot_day"   class="radio" value="2"></label></div>';
+               var holiday =  isHoliday(date,2);
+                var append = '<div class="col-md-6 col-6"><input type="hidden" name="holiday[]" value="'+isHoliday(date,2)+'"><label> Night <input required type="checkbox" name="slot_day" checked  class="radio" value="2"></label></div>';
                $(".slots").append(append);
                }
               else if(result.nightsbooked.includes(date))
                {
                
                 disable=true;
-                var append = '<div class="col-md-6 col-6 text-center"><label> Day <input required type="checkbox" name="slot_night"   class="radio" value="1"></label></div>';
+                var append = '<div class="col-md-6 col-6 text-center"><input type="hidden" name="holiday[]" value="'+isHoliday(date,1)+'"><label> Day <input required type="checkbox" name="slot_night" checked  class="radio" value="1"></label></div>';
                $(".slots").append(append);
                }
               
               else{
                 disable=true;
-                var append = '<div class="col-md-6 col-6 text-center"><label> Day <input type="checkbox" name="slot_day"    class="radio" value="1"></label></div><div class="col-md-6 col-6"><label> Night <input type="checkbox" name="slot_night"   class="radio" value="2"></label></div>';
+                var append = '<div class="col-md-6 col-6 text-center"><input type="hidden" name="holiday[]" value="'+isHoliday(date,1)+'"><label> Day <input type="checkbox" name="slot_day"  checked   class="radio" value="1"></label></div><div class="col-md-6 col-6"><input type="hidden" name="holiday[]" value="'+isHoliday(date,2)+'"><label> Night <input type="checkbox" name="slot_night"   class="radio" value="2"></label></div>';
                 $(".slots").append(append);
               }
             

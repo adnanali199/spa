@@ -34,7 +34,7 @@ class Booking extends Model
          }
           //dd($owner_pools);
         $events =  $this->join('users','bookings.customer_id','=','users.id')
-        ->select('bookings.id','users.name','bookings.booking_date','bookings.status')->orderBy('bookings.id')
+        ->select('bookings.id','users.name','bookings.booking_date','bookings.status','bookings.booked_by')->orderBy('bookings.id')
         ->get();
         return $events;
         

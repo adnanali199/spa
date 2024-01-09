@@ -69,28 +69,28 @@
                             <th>{{__('Pool') }}</th>
                             <th>{{__('Date') }}</th>
                             <th>{{__('Period') }}</th>
-                            <th width="44px">{{__('Advance') }}</th>
+                            <th width="10%">{{__('Advance') }}</th>
                             <th></th>
                         </tr>
                         @php  $total=0; @endphp
                         @if($cart)
-                        @foreach($cart as $item)
-                        <input type="hidden" name="pool_id[]" value="{{$item['pool_id']}}">
-                        <input type="hidden" name="booking_date[]" value="{{$item['booking_date']}}">
-                        <input type="hidden" name="slot_id[]" value="{{$item['slot_id']}}">
+                        @foreach($cart as $key=>$val)
+                        <input type="hidden" name="pool_id[]" value="{{$val['pool_id']}}">
+                        <input type="hidden" name="booking_date[]" value="{{$val['booking_date']}}">
+                        <input type="hidden" name="slot_id[]" value="{{$val['slot_id']}}">
                         
                         @php
-                        $total += $item['normal_price'];
+                        $total += $val['normal_price'];
                         @endphp
                         <tr>
-                            <td> {{ $item['pool_name'] }} </td>
-                        <td> {{ $item['booking_date'] }} </td>
-                        <td> {{ ($item['slot_id']==1)?'DAY':'NIGHT' }} </td>
+                            <td> {{ $val['pool_name'] }} </td>
+                        <td> {{ $val['booking_date'] }} </td>
+                        <td> {{ ($val['slot_id']==1)?'DAY':'NIGHT' }} </td>
                         <td>
-                            <input type="number" name="advance_price[]" class="form-control" value="{{$item['advance_price']}}" id="advance_total">
+                            <input type="number" name="advance_price[]" class="form-control" value="{{$val['advance_price']}}" id="advance_total">
                         </td>
                         <td>
-                            <a href="{{route('pool.removeCartItem',$loop->index)}}" title="{{__('Remove from cart')}}" class="btn btn-sm btn-danger"><i class="fas fa-trash" style="font-size:12px"></i></a>
+                            <a href="{{route('pool.removeCartItem',$key)}}" title="{{__('Remove from cart')}}" class="btn btn-sm btn-danger"><i class="fas fa-trash" style="font-size:12px"></i></a>
                         </td>
                             
                         @endforeach
@@ -208,11 +208,17 @@
             success:function(result){
               if(result.status==1 && !customer_id)
               {
-                if(slot=="day"){
-                $("#customer_name").val('');$("#cpr").val('');$("#phone").val('');
-                }
-                else{$("#ncustomer_name").val('');$("#ncpr").val('');$("#nphone").val('');}
+                $("#customer_id").val(result.user[0].id);
+                $("#customer_name").val(result.user[0].name);$("#cpr").val(result.user[0].cpr);$("#phone").val(result.user[0].phone);
+                
+              //  else{$("#ncustomer_name").val(result.user.);$("#ncpr").val('');$("#nphone").val('');}
                 alert('Customer exists already');
+                if(result.auth==1){
+                window.location.reload();
+                }
+                else{
+                    
+                }
               }
 
             }

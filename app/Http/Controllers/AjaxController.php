@@ -72,6 +72,7 @@ class AjaxController extends Controller
                 'title' => '',
                 'customer_name'=>$event->name,
                 'booking_id'=>$event->id,
+                'booked_by'=>$event->booked_by,
                 'booking_date'=>$pool->pivot->booking_date,
                 'pool_name'=>   $pool->pool_name,
                 'slot'=>        $pool->pivot->slot_id==1?'Day':'Night',
@@ -258,22 +259,30 @@ class AjaxController extends Controller
         $phone=$request->phone?$request->phone:0;
         $name=$request->customer_name?$request->customer_name:0;
         $mode = $request->mode;
-        $phone_exists=array();$cpr_exists=array();$name_exists=array();
+        $auth = $request->owner?$request->owner:false;
+        $user=array();
        if(!empty($phone)){
-        $phone_exists=User::where('phone',$phone)->get();
+        $user=User::where('phone',$phone)->get();
         //echo "<pre>";print_r($phone_exists);die();
        }
        if(!empty($name)){
        
-       $name_exists=User::where('name','=',$name)->get();//->orWhere('cpr',$cpr)->orWhere('name','=',$name)->get();
+       $user=User::where('name','=',$name)->get();//->orWhere('cpr',$cpr)->orWhere('name','=',$name)->get();
        }
        if(!empty($cpr)){ 
-       $cpr_exists=User::where(['cpr'=>$cpr])->get();
+       $user=User::where(['cpr'=>$cpr])->get();
        }
-            if(count($phone_exists)>0|| count($name_exists)>0 || count($cpr_exists)>0){
-               // print_r($name_exists);
-                
-                return response()->json(array('status'=>1,'slot'=>$mode));
+            if(count($user)>0){
+             if(!$auth){
+               if(\Auth::attempt(array('phone'=>$user[0]->phone,'password'=>$user[0]->cpr)))
+               {
+                $auth = 1;
+               }
+            }
+            else{
+            
+            }
+                return response()->json(array('status'=>1,'slot'=>$mode,'user'=>$user,'auth'=>$auth));
             }
             else{
                 return response()->json(array('status'=>0));

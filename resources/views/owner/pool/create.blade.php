@@ -31,7 +31,7 @@
              <div class="">
                 <div class="card">
                     <div class="card-body ">
-                        <form method="POST" action="{{ route('owner.poolaction',$pool->id??0) }}" enctype="multipart/form-data">
+                        <form method="POST" id="searchform" action="{{ route('owner.poolaction',$pool->id??0) }}" enctype="multipart/form-data">
                             @csrf
                 
                             <div class="mb-3">
@@ -46,7 +46,8 @@
                                 </span>
                                 @enderror
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 row">
+                                <div class="col-6">
                                 <label>{{__("Short Name") }}</label>
                                 <input type="text" name="short_name" class="form-control @error('short_name') is-invalid @enderror"
                                        placeholder="{{ __('Short Name') }}"
@@ -58,6 +59,15 @@
                                     {{ $message }}
                                 </span>
                                 @enderror
+                            </div>
+                            <div class="col-6 ">
+                                <label>{{__('Pool Type')}}</label>
+                                <select name="pool_type" class="select2  form-control">
+                                <option @if(($pool && $pool->pool_type=='Natural water') || old('pool_type')=='Natural water') selected @endif  value="Natural water">Natural water</option>
+                                <option @if(($pool && $pool->pool_type=='Chlorine water') || old('pool_type')=='Chlorine water') selected @endif value="Chlorine water">Chlorine water</option>
+                                <option @if(($pool && $pool->pool_type=='Jacuzzi') || old('pool_type')=='Jacuzzi') selected @endif value="Jacuzzi">Jacuzzi</option>    
+                                </select>
+                            </div>
                             </div>
 
                             <div class="row mb-3">
@@ -77,11 +87,12 @@
                                 </span>
                                 @enderror
                                 @if($pool && $pool->images)
-                                <div class="mt-2">
+                                <div class="mt-2 relative row">
                                 @foreach($pool->images as $image)
-                        
+                                <div class="col-4 col-md-2">
                                 <img  src=" {{ asset('uploads/'.$image->pool_image) }} " width="150px" class="img img-responsive img-thumbnail">
-                                <a style="position: absolute;left:5px;bottom:0px" href="#" data-href="{{ route('owner.pools.deleteimg',$image->id)}}" class="btn btn-sm delete" title="{{ __('delete') }}"><i class="text-danger fa fa-trash fa-2x"></i></a>
+                                <a style="position: absolute;left:5px;bottom:0px;background:rgba(0,0,0,.5);color:#FFF" href="#" data-href="{{ route('owner.pools.deleteimg',$image->id)}}" class="btn btn-sm delete" title="{{ __('delete') }}"><i class=" fa fa-trash" style="font-size:16px"></i></a>
+                                </div>
                                 @endforeach 
                                 </div>
                                 @endif
@@ -112,10 +123,10 @@
                             </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-md-12 py-2 border-bottom bg-info">Pool Features</label>
+                                <label class="col-md-12 py-2 border-bottom bg-info">{{ __('Pool Features') }}</label>
                                 <hr>
                                 <div class="col-md-4">
-                                    <label>Length</label>
+                                    <label>{{__('Length')}}</label>
                                 <input type="number" min=0 step=0.1 name="length" class="form-control @error('length') is-invalid @enderror"
                                        placeholder="{{ __('Length') }}"
                                        value={{    ($pool)?$pool->length:old('length') }} 
@@ -128,7 +139,7 @@
                                 @enderror
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Width </label>
+                                    <label>{{__('Width')}} </label>
                                     <input type="number" min=0 step=0.1 name="width" class="form-control @error('width') is-invalid @enderror"
                                            placeholder="{{ __('Width') }}"
                                            value={{    ($pool)?$pool->width:old('width') }} 
@@ -141,7 +152,7 @@
                                     @enderror
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Depth</label>
+                                        <label>{{__('Depth')}}</label>
                                     <input type="number" min=0 step=0.1 name="depth" class="form-control @error('depth') is-invalid @enderror"
                                            placeholder="{{ __('Depth') }}"
                                            value={{    ($pool)?$pool->depth:old('depth') }} 
@@ -158,21 +169,19 @@
 
                             <div class="feature mb-2">
                                <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-5">
                                     <label>{{__('Feature Name')}}</label>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-5">
                                     <label>{{__('Feature Value')}}</label>
                                 </div>
                                 </div>
-                                
-                               </div>
                                 @if($pool && count($features1)>0)
                                 <?php $i=0;  ?>
                                 @foreach($features1 as $feature1)
                                 
                                 <div class="row">    
-                                    <div class="col-4 mt-1">
+                                    <div class="col-5 mt-1">
                                         <select name="feature_id[]" class="select2  form-control">
                                             @foreach($features as $feature)
                                             <option value="{{$feature->id}}" @if($feature->id==$feature1->feature_id) selected @endif>
@@ -181,46 +190,57 @@
                                             @endforeach
                                            </select>
                                     </div>
-                                    <div class="col-4 mt-1">
-                                        <input type="number" min="0" step="1" name="feature_value[]" value="{{$feature1->feature_value}}" class="  form-control"
+                                    <div class="col-5 mt-1">
+                                        <input type="number" min="0" step="1" name="feature_value[]" 
+                                        value="{{$feature1->feature_value}}" class="  form-control"
                                         placeholder="{{__('Feature Value')}}">
                                           
                                     </div>
                                         
                                         <div class="col-2 mt-1 text-center">
-                                            @if($i==0)
-                                            <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
-                                            @else
-                                            <span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span>
-                                            @endif
+                                            
+                                            <span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)">
+                                                <i class="fa fa-minus"> </i></span>
+                                           
                                         </div>
+                                        
                                     </div>
                                     @php 
                                     $i++;
                                     @endphp
                                 @endforeach
-                                @else
-                                <div class="row">    
-                                    <div class="col-md-4 mt-1">
-                                        <select name="feature_id[]" class="select2 form-control">
-                                            @foreach($features as $feature)
-                                            <option value="{{$feature->id}}">
-                                            {{$feature->feature_title}}
-                                            </option>
-                                            @endforeach
-                                        </select>
+                                
+                                    @else
+                                    <div class="row">    
+                                        <div class="col-md-5 mt-1">
+                                            <select name="feature_id[]" class="select2 form-control">
+                                                @foreach($features as $feature)
+                                                <option value="{{$feature->id}}">
+                                                {{$feature->feature_title}}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-5 mt-1">
+                                            <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control"
+                                            placeholder="{{__('Feature Value')}}">
+                                              
+                                        </div>
+                                        
+                                        <div class="col-md-2 mt-1 text-center">
+                                            <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
+                                        </div>
                                     </div>
-                                    <div class="col-4 mt-1">
-                                        <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control"
-                                        placeholder="{{__('Feature Value')}}">
-                                          
-                                    </div>
-                                    
-                                    <div class="col-md-2 mt-1 text-center">
-                                        <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
-                                    </div>
+                                    @endif
+                               </div>
+                               <div class="row">
+                                <div class="col-10"></div>
+                                <div class="col-2 text-center">
+                                <span class="btn btn-sm btn-success add_feature"><i class="fa fa-plus"> </i></span>
                                 </div>
-                                @endif
+                            </div>
+                               
+                            
                          
                             
 
@@ -441,7 +461,7 @@
 <script>
      $(document).ready(function(){
             $(".remove_feature").click(function(){
-                alert();
+                
                     $(this).parent().parent().remove();
             });
         });
@@ -455,8 +475,11 @@
             "heading| bold italic | bullist numlist",
             "code"
             ],  });
+            
      */       
+    
             $(".add_feature").click(function(){
+                
                 var append = '<div class="row mt-1">'+   
                              '<div class="col-4 mt-1">'+
                              '<select name="feature_id[]" class="select2 form-control">';
@@ -464,7 +487,7 @@
                                     @foreach($features as $feature)
                                     append +='<option value="{{$feature->id}}">{{$feature->feature_title}}</option>';
                                     @endforeach
-                                   append+='</select> </div> <div class="col-4 mt-1"> <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control" placeholder="{{__('Feature Value')}}"> </div><div class="col-2 mt-1 text-center"><span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-trash"> </i></span></div></div>';
+                                   append+='</select> </div> <div class="col-4 mt-1"> <input type="number" min="0" step="1" name="feature_value[]" value="" class="  form-control" placeholder="{{__('Feature Value')}}"> </div><div class="col-2 mt-1 text-center"><span class="btn btn-sm btn-danger remove_feature" onclick="remove(this)"><i class="fa fa-minus"> </i></span></div></div>';
                 $(".feature").append(append);
             });
            function remove(ele)

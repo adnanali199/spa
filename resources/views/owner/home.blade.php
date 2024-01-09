@@ -541,20 +541,23 @@ margin-bottom:0px;
    function checkCustomerExists(name,cpr,phone,slot)
    {
     customer_id = $("#customer_id").val();
+    
     $.ajax( {
             url: "{{route('ajax.check_user')}}",
             data:  {
                 customer_name:name,
                 cpr:cpr,
                 phone:phone,
-                mode:slot
+                mode:slot,
+                owner:1
             },
             success:function(result){
-              if(result.status==1 && !customer_id)
+              if(result.status==1)
               {
                 if(slot=="day"){
-                $("#customer_name").val('');$("#cpr").val('');$("#phone").val('');
-                }else{$("#ncustomer_name").val('');$("#ncpr").val('');$("#nphone").val('');}
+                $("#customer_id").val(result.user[0].id);
+                $("#customer_name").val(result.user[0].name);$("#cpr").val(result.user[0].cpr);$("#phone").val(result.user[0].phone);
+                }else{$("#ncustomer_name").val(result.user[0].name);$("#ncpr").val(result.user[0].cpr);$("#nphone").val(result.user[0].phone);}
                 alert('Customer exists already');
               }
 
@@ -563,7 +566,7 @@ margin-bottom:0px;
    }
   $(document).ready(function(){
     
-    $("#customer_name,#cpr,#phone").keyup(function(){
+    $("#customer_name,#cpr,#phone").change(function(){
         customer_name = $("#customer_name").val();
         cpr =  $("#cpr").val();
         phone =   $("#phone").val();
@@ -572,7 +575,7 @@ margin-bottom:0px;
         }
     });
 
-    $("#ncustomer_name,#ncpr,#nphone").keyup(function(){
+    $("#ncustomer_name,#ncpr,#nphone").change(function(){
         customer_name = $("#ncustomer_name").val();
         cpr =  $("#ncpr").val();
         phone =   $("#nphone").val();
@@ -917,8 +920,16 @@ function loadCalendar(events) {
 
     eventDidMount: function (info) {
         var date =info.event.extendedProps.booking_date;
+        var booked_by =info.event.extendedProps.booked_by;
+        var owner = "{{ \Auth::user()->id }}";
         var slots = info.event.extendedProps.slots;
         var parent = $(info.el).parent().parent().parent();
+        console.log(info.event.extendedProps);
+        if(booked_by==owner)
+        {
+            cell=info.el;
+            $(cell).parent().parent().parent().prepend('<i style="position:absolute;top:5px" class="fas fa-star"></i>');
+        }
         if(slots){
             console.log(date);
             if(slots.unavailable.includes(date)){
@@ -945,9 +956,8 @@ function loadCalendar(events) {
       
         },
         
-        
+       
         eventClick: function(info) {
-            
       var eventObj = info.event;
       info=eventObj.extendedProps.booking_date;
      dateClick1(info);

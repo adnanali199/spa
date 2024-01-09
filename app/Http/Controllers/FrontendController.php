@@ -102,10 +102,16 @@ class FrontendController extends Controller
         $cart = $request->session()->get('cart');
         unset($cart[$id]);
         Session::put('cart', $cart);
+        if(count($cart)>0){
          return back()->with('success',"Item Removed from cart.");
+        }
+        else{
+            return redirect(route('/')."#pools")->with('success',"Item Removed from cart.");
+        }
     }
     public function addToCart(Request $request)
      {
+        //dd($request->all());
         $cart = $request->session()->get('cart');
         $submit = $request->submit;
         if($submit && ($cart && count($cart) > 0))
@@ -121,14 +127,14 @@ class FrontendController extends Controller
          $user_id = $request->user_id?$request->user_id:0;
          $pool = Pool::find($request->pool_id);
         
-         
+         $holiday = $request->holiday;
          $slot_day = $request->slot_day?$request->slot_day:0;
          $slot_night = $request->slot_night?$request->slot_night:0;
          if($slot_day){
          $data[] =array(
             "pool_id"=>$request->pool_id,
             "pool_name"=>$pool->pool_name ,
-            "normal_price"=>$pool->price ,
+            "normal_price"=>($holiday[0]==1)?$pool->holiday_price:$pool->price ,
             "advance_price"=>$pool->advance_price,
             'holiday_price'=>$pool->holiday_price,
             "booking_date"=>$request->booking_date,
@@ -140,7 +146,7 @@ class FrontendController extends Controller
         $data[] =array(
            "pool_id"=>$request->pool_id,
            "pool_name"=>$pool->pool_name ,
-           "normal_price"=>$pool->price ,
+           "normal_price"=>($holiday[1]==1)?$pool->holiday_price:$pool->price , 
            "advance_price"=>$pool->advance_price,
            'holiday_price'=>$pool->holiday_price,
            "booking_date"=>$request->booking_date,
@@ -178,6 +184,7 @@ class FrontendController extends Controller
          ]);
          // user id from logged in user
          $user_id = $request->user_id?$request->user_id:0;
+         $phone='';$cpr="";
          if($user_id==0 || !$user_id || $user_id=="0")
         {
             
@@ -255,21 +262,48 @@ class FrontendController extends Controller
          $this->sendNotification($title,$body,$pool->owner_id);
          //after successful booking clear the cart
          $request->session()->forget('cart');
+         if(!\Auth::check()){
+         if(\Auth::attempt(array('phone'=>$phone,'password'=>$cpr)))
+         {
+            return redirect(route('bookings'))->with('success',"Your booking request is sent successfully.");
+         }
+        }
          return redirect(route('bookings'))->with('success',"Your booking request is sent successfully.");
      }
+     function dateRange( $first, $last, $step = '+1 day', $format = 'Y-m-d' ) {
+
+        $dates = array();
+        $current = strtotime( $first );
+        $last = strtotime( $last );
+    
+        while( $current <= $last ) {
+    
+            $dates[] = date( $format, $current );
+            $current = strtotime( $step, $current );
+        }
+    
+        return $dates;
+    }
      public function search(Request $request)
      {
-        $search = $request->search_term;
-        $date_from = $request->date_from;
-        $date_to = $request->date_to;
+        
+        $search = '';
+        $date_from = $request->date_from?$request->date_from:date('Y-m-d');
+        $cdate=date_create($date_from);
+        $cdate = date_modify($cdate,"+15 days");
+        $ddate=date_format($cdate,"Y-m-d");
+        $date_to = $request->date_to?$request->date_to:$ddate;
+        $date =date("Y-m-d");
+        $daterng=$this->dateRange($date_from,$date_to);
         $city = $request->city;
-        $pools = Pool::where('pool_name','LIKE',"%{$search}%")->orWhere('short_name','LIKE',"%{$search}%")
-        ->orWhere('city','LIKE',"%{$search}%")
-        ->orWhere('state','LIKE',"%{$search}%");
-        if($date_from && $date_to)
+        $pools = Pool::where('pool_name','LIKE',"%{$search}%")->where('short_name','LIKE',"%{$search}%");
+        
+        if($date_from && $date_to )
         {
-            $pools->join("pool_schedules","pools.id","=","pool_schedules.pool_id")
-            ->whereNotBetween('date_available', [$date_from, $date_to]);
+            $pools->leftjoin("pool_schedules","pools.id","=","pool_schedules.pool_id")
+            ->whereNotIn('date_available', $daterng);
+            
+            
         }
         if($city)
         {

@@ -150,11 +150,20 @@
         <a href="{{route('/')}}" class="standard-logo"><img src="{{ asset('frontend/demos/spa/images/logo.png')}}" alt="Canvas Logo"></a>
         <a href="{{route('/')}}" class="retina-logo"><img src="{{ asset('frontend/demos/spa/images/logo.png')}}" alt="Canvas Logo"></a>
         </div>
-        <div id="right" style="position:absolute;right:20px;top:40px;z-index:100000000001">
+        @php
+        $cartcount = \Session::get('cart');
+
+        @endphp
+        <div  id="right" style="position:absolute;right:20px;top:40px;z-index:100000000001">
+          
+            <a href="{{route('pool.checkout')}}" ><i class="fas fa-cart-plus text-white" style="margin-right:10px">
+            {{ $cartcount?count($cartcount):0 }} </i>
+            </a>
+ 
             @if (Route::has('login'))
         
             @auth
-            <div class=" dropdown">  
+            <div class=" dropdown" style="display:inline-block;">  
            
               <a class=""  style="color:#FFF;font-weight:bolder" data-toggle="dropdown" href="#" aria-expanded="false">
                   {{ Auth::user()->name }}
@@ -228,10 +237,7 @@
          
       
             </li>
-            @php
-            $cartcount = \Session::get('cart');
-
-            @endphp
+           
             <li><a href="{{route('pool.checkout')}}" ><i class="fas fa-cart-plus fa-2x" style="font-size: 20px">{{ $cartcount?count($cartcount):0 }} </i></a></li>
         @if (Route::has('login'))
         
@@ -286,7 +292,7 @@
                 <li class="">  
                     <!-- Right navbar links -->
                 
-                 
+                    
                       <a class=""  href="{{route('login')}}" aria-expanded="false">
                           Login
                       </a>

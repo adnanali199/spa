@@ -53,6 +53,9 @@
         background-color:rgba(0,0,0,0)!important;
         border:none!important;
     }
+    .btn-sm{
+        border-radius:20px;
+    }
     </style>
 
     @yield('styles')
@@ -66,6 +69,9 @@
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" title="{{__('Go Back')}}" onClick="history.go(-1); return false;"><i class="fas fa-arrow-left"></i></a> 
             </li>
         </ul>
 

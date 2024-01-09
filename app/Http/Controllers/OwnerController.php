@@ -45,6 +45,7 @@ class OwnerController extends Controller
             'booking_id'=>$event->id,
             'booking_date'=>date('Y-m-d',strtotime($pool->pivot->booking_date)),
             'pool_name'=>   $pool->pool_name,
+            'booked_by'=>$event->booked_by,
             'slot'=>        $pool->pivot->slot_id==1?'Day':'Night',
             'start' => $pool->pivot->booking_date,
             'end' => $pool->pivot->booking_date,

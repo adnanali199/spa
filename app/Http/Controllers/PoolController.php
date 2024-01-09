@@ -46,7 +46,7 @@ class PoolController extends Controller
     public function poolaction(Request $request,$id=false)
     {
         //validate
-        
+       
         if(!$id)
         {
             $validate=$request->validate([
@@ -85,6 +85,7 @@ class PoolController extends Controller
             $pool->address = $request->street;
             $pool->latitude = $request->latitude;
             $pool->longitude = $request->longitude;
+            $pool->pool_type = $request->pool_type;
             $pool->save();
         $id=$pool->id;
         }
@@ -107,6 +108,8 @@ class PoolController extends Controller
             $pool->address = $request->street;
             $pool->latitude = $request->latitude;
             $pool->longitude = $request->longitude;
+            $pool->pool_type = $request->pool_type;
+          //  die($request->pool_type);
             $pool->save();
         }
         

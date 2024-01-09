@@ -170,6 +170,7 @@ class BookingController extends Controller
         $booking->booking_type = $booking_type;
         $booking->total_price = $total;
         $booking->notes = $notes;
+        $booking->booked_by=\Auth::user()->id;
         //$booking->book = $notes;
         $booking->save();
         if($booking_id==0)

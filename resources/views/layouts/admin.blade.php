@@ -17,6 +17,9 @@
     <link href="{{asset('css/select2.min.css')}}" rel="stylesheet" />
 
     <style>
+        .btn-sm{
+        border-radius:20px;
+    }
          .fc .fc-button{
             padding:3px 5px;
             margin-top:3px;
